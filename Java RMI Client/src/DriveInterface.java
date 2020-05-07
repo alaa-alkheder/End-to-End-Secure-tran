@@ -8,8 +8,8 @@ import java.rmi.RemoteException;
  * Github:alaa-alkheder
  */
 
-public interface ChatInterface extends java.rmi.Remote {
-    boolean checkClientCredintials(ChatInterface ci,String name, String pass) throws RemoteException;
+public interface DriveInterface extends java.rmi.Remote {
+    boolean checkClientCredintials(DriveInterface ci,String name, String pass) throws RemoteException;
     void broadcastMessage(String name,String message) throws RemoteException;
     void sendMessageToClient(String message) throws RemoteException;
 
@@ -19,8 +19,10 @@ public interface ChatInterface extends java.rmi.Remote {
     Boolean forgetPassword(User user)  throws RemoteException;
     Boolean ChangePassword(User user)  throws RemoteException;
 
+    public void sendFileToClient(String FileName)throws RemoteException;
+    void addFileInfo(String filename, int len, String type) throws RemoteException;
     void UpLoadFile(String filename, byte[] data, int len) throws RemoteException;
-    Object downloadFile()throws RemoteException;
+    Object downloadFile(String filename, byte[] data, int len)throws RemoteException;
     Object showAllFile()throws RemoteException;
     String[] showAllUser() throws RemoteException;
 }

@@ -1,2 +1,3 @@
 1-Add cc feature when we send a file
 2-add private cc when we send a file
+3-the user can create category Files

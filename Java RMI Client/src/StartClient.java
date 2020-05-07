@@ -16,7 +16,7 @@ public class StartClient {
 
 
 //
-        ChatInterface chatinterface = (ChatInterface) Naming.lookup("rmi://localhost/RMIServer");
+        DriveInterface chatinterface = (DriveInterface) Naming.lookup("rmi://localhost/RMIServer");
         new Thread(new Client(chatinterface)).start();
     }
 

@@ -1,4 +1,6 @@
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
@@ -10,20 +12,26 @@ import java.util.ArrayList;
  * Github:alaa-alkheder
  */
 
-public class Server extends UnicastRemoteObject implements ChatInterface {
+public class Server extends UnicastRemoteObject implements DriveInterface {
 
     private static final long serialVersionUID = 1L;
-//    private static String clientName [] = {"alaa","Dinesh","Asjad","Clarry","Tahar"};
-//    private static String clientPass [] = {"12345","123456","12345","123456","12345"};
-    private ArrayList<ChatInterface> clientList;
+    private ArrayList<DriveInterface> clientList;
+    private String path="";
+    DriveInterface sssss;
 
     protected Server() throws RemoteException {
-        clientList = new ArrayList<ChatInterface>();
+        clientList = new ArrayList<DriveInterface>();
+
     }
 
-    public synchronized boolean checkClientCredintials(ChatInterface chatinterface,String clientname,String password) throws RemoteException {
+    public synchronized boolean checkClientCredintials(DriveInterface chatinterface,String clientname,String password) throws RemoteException {
         if (StartServer.CheckUserPassword(clientname,password)){
             this.clientList.add(chatinterface);
+            sssss=chatinterface;
+            sssss.sendMessageToClient("asddsaasd");
+//            sssss.sendFileToClient("");
+            //!!!! un comment next line after create register
+//            path=StartServer.userProfile.get(clientname).getPath();
             return true;
         }
         return false;
@@ -51,15 +59,18 @@ public class Server extends UnicastRemoteObject implements ChatInterface {
         boolean b = f.mkdir();
         if (b) {
             user.setPath(path);
-//            System.out.println("userFile\\" + user.getUniqueName());
         }
         else {
             //!!!!! Create random path
         }
+
         //this file for save a temp object when we receive a notification and the user is offline
         File file=new File(path+"\\"+"temp.txt");
+        //this file save the uploaded file in the server
+        File Userfiles=new File(path+"\\"+"UserFiles.xls");
         try {
             file.createNewFile();
+            Userfiles.createNewFile();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -71,7 +82,53 @@ public class Server extends UnicastRemoteObject implements ChatInterface {
         return true;
     }
 
-/**
+
+    /**
+     *
+     */
+    public void sendFileToClient(String FileName) throws RemoteException {
+        String path="qwqw.pdf";//path for user + file name
+        File f1 = new File(path);
+        int fileSize=0;
+        int timer=0;
+        try {
+            fileSize= (int) (Files.size(Paths.get(path))/1024/1024)+1;
+            timer=fileSize;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        FileInputStream in = null;
+        try {
+            in = new FileInputStream(f1);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        byte[] mydata = new byte[1024 * 1024];
+        int mylen = 0;
+        try {
+            mylen = in.read(mydata);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        while (mylen > 0) {
+            //timer for Upload
+            System.out.println("Done Upload File Input Stream ..."+ --timer);
+           sssss.downloadFile  (f1.getName(), mydata, mylen);
+            try {
+                mylen = in.read(mydata);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
+
+
+
+    /**
  * this function when we create a new account ,we test a unique Name is booked up
  * if the test result true this mean the name is booked up
  * */
@@ -92,28 +149,38 @@ public class Server extends UnicastRemoteObject implements ChatInterface {
         System.out.println("User change Password");
         return null;
     }
-
+    int i=0;//test delete after the finish code
     @Override
     public void UpLoadFile(String filename, byte[] data, int len) throws RemoteException
     {
         try{
+
             File f=new File(filename);
             f.createNewFile();
             FileOutputStream out=new FileOutputStream(f,true);
             out.write(data,0,len);
             out.flush();
             out.close();
-            System.out.println("Done writing data...");
+            //timer for download
+            System.out.println("Done writing data..."+ i++);
         }catch(Exception e){
             e.printStackTrace();
         }
     }
 
     @Override
-    public Object downloadFile() throws RemoteException {
-        System.out.println("Download file");
+    public void addFileInfo(String filename, int len, String type) throws RemoteException {
+        System.out.println(filename);
+        System.out.println(len +"MB");
+        System.out.println(type);
+        //add file upload info to UserFiles.xls
+    }
+
+    @Override
+    public Object downloadFile(String filename, byte[] data, int len) throws RemoteException {
         return null;
     }
+
 
     @Override
     public Object showAllFile() throws RemoteException {
