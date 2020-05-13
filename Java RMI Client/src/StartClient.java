@@ -13,9 +13,6 @@ import java.util.Scanner;
  */
 public class StartClient {
     public static void main(String[] args) throws IOException, NotBoundException, NotBoundException {
-
-
-//
         DriveInterface chatinterface = (DriveInterface) Naming.lookup("rmi://localhost/RMIServer");
         new Thread(new Client(chatinterface)).start();
     }

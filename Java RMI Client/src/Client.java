@@ -1,5 +1,3 @@
-import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.io.*;
 import java.nio.file.Files;
@@ -16,7 +14,7 @@ import java.util.Scanner;
  */
 public class Client extends UnicastRemoteObject implements DriveInterface, Runnable {
     private static final long serialVersionUID = 1L;
-    private DriveInterface server;
+  static  DriveInterface server;
     private String ClientName;
     boolean chkExit = true;
     boolean chkLog = false;
@@ -179,7 +177,7 @@ public class Client extends UnicastRemoteObject implements DriveInterface, Runna
         System.out.println("\n~~ Enter 1 to log in ~~\n");
         System.out.println("\n~~ Enter 2 to Sign up ~~\n");
 
-        switch (1) {
+        switch (2) {
             //creat new account
             case 1: {
                 System.out.print("Enter The Name : ");

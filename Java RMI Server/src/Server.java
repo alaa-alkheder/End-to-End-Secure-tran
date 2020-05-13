@@ -54,6 +54,7 @@ public class Server extends UnicastRemoteObject implements DriveInterface {
      */
     @Override
     public Boolean registerUser(User user) throws RemoteException {
+        System.out.println("DDDDDDDDDDDDDDDDDDDDDDDD");
         String path="userFile\\" + user.getUniqueName();
         File f = new File(path);
         boolean b = f.mkdir();
