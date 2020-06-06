@@ -1,4 +1,3 @@
-import java.io.File;
 import java.rmi.RemoteException;
 
 /**
@@ -9,8 +8,8 @@ import java.rmi.RemoteException;
  */
 
 public interface DriveInterface extends java.rmi.Remote {
-    boolean checkClientCredintials(DriveInterface ci,String name, String pass) throws RemoteException;
-    void broadcastMessage(String name,String message) throws RemoteException;
+    boolean checkClientCredintials(DriveInterface ci, String name, String pass) throws RemoteException;
+    void broadcastMessage(String name, String message) throws RemoteException;
     void sendMessageToClient(String message) throws RemoteException;
 
 

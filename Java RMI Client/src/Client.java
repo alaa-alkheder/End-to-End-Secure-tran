@@ -39,7 +39,9 @@ public class Client extends UnicastRemoteObject implements DriveInterface, Runna
 //        server.showAllFile();
 //        System.out.println(server.downloadFile());
     }
-
+static public boolean soso() throws RemoteException {
+        return server.checkClientCredintials(server,"alaa17","17");
+}
     public void sendFileToServer(String message) throws RemoteException {
         FileDialog dialog = new FileDialog((Frame)null, "Select File to Open");
         dialog.setMode(FileDialog.LOAD);
@@ -186,7 +188,7 @@ public class Client extends UnicastRemoteObject implements DriveInterface, Runna
                 clientPassword = scanner.nextLine();
 
                 try {
-                    chkLog = server.checkClientCredintials(this, clientName, clientPassword);
+                    chkLog = server.checkClientCredintials(server, clientName, clientPassword);
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 }
@@ -207,7 +209,7 @@ public class Client extends UnicastRemoteObject implements DriveInterface, Runna
 //                }
                 if (true) {
 
-                    User user = new User(clientName, clientPassword);
+                    User user = new User();
                     //!!! Add another user information
                     boolean b = false;
                     try {

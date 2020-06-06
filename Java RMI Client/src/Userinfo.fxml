@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.effect.ColorAdjust?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="549.0" prefWidth="466.0" style="-fx-border-color: c99704; -fx-border-width: 15;" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="userInfoController">
+    <stylesheets>
+        <URL value="@ListViewStyle.css" />
+    </stylesheets>
+    <children>
+        <ImageView fx:id="backgroundImage" fitHeight="500.0" fitWidth="445.0" layoutX="19.0" layoutY="19.0" opacity="0.85">
+            <image>
+                <Image url="@image/Picture114.png" />
+            </image>
+        </ImageView>
+        <ImageView fitHeight="323.0" fitWidth="405.0" layoutX="50.0" layoutY="130.0" opacity="0.22">
+            <image>
+                <Image url="@image/Picture13.png" />
+            </image>
+        </ImageView>
+        <Pane layoutX="36.0" layoutY="44.0" prefHeight="461.0" prefWidth="423.0" style="-fx-border-color: #c99609; -fx-border-width: 5;">
+            <children>
+                <Label layoutX="46.0" layoutY="93.0" text="Full name " textFill="#e1195c">
+                    <font>
+                        <Font name="System Bold" size="20.0" />
+                    </font>
+                    <effect>
+                        <ColorAdjust brightness="-0.12" contrast="0.19" hue="-0.05" saturation="0.88" />
+                    </effect>
+                    <graphic>
+                        <ImageView fitHeight="34.0" fitWidth="39.0">
+                            <image>
+                                <Image url="@image/user (1).png" />
+                            </image>
+                        </ImageView>
+                    </graphic>
+                </Label>
+                <Label layoutX="39.0" layoutY="139.0" prefHeight="72.0" prefWidth="224.0" text="Unique Name" textFill="#e1195c">
+                    <font>
+                        <Font name="System Bold" size="20.0" />
+                    </font>
+                    <effect>
+                        <ColorAdjust brightness="-0.12" contrast="0.19" hue="-0.05" saturation="0.88" />
+                    </effect>
+                    <graphic>
+                        <ImageView fitHeight="34.0" fitWidth="39.0">
+                            <image>
+                                <Image url="@image/user (1).png" />
+                            </image>
+                        </ImageView>
+                    </graphic>
+                </Label>
+                <Label layoutX="50.0" layoutY="300.0" text="Email" textFill="#e1195c">
+                    <font>
+                        <Font name="System Bold" size="20.0" />
+                    </font>
+                    <graphic>
+                        <ImageView fitHeight="34.0" fitWidth="39.0">
+                            <image>
+                                <Image url="@image/email (1).png" />
+                            </image>
+                        </ImageView>
+                    </graphic>
+                </Label>
+                <Label layoutX="46.0" layoutY="367.0" text="Birthday" textFill="#e1195c">
+                    <font>
+                        <Font name="System Bold" size="20.0" />
+                    </font>
+                    <effect>
+                        <ColorAdjust brightness="-0.12" contrast="0.19" hue="-0.05" saturation="0.88" />
+                    </effect>
+                    <graphic>
+                        <ImageView fitHeight="42.0" fitWidth="39.0">
+                            <image>
+                                <Image url="@image/cake.png" />
+                            </image>
+                        </ImageView>
+                    </graphic>
+                </Label>
+                <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#d7be796e" height="60.0" layoutX="5.0" layoutY="6.0" stroke="#c9b98e" strokeLineCap="ROUND" strokeType="INSIDE" strokeWidth="3.0" width="412.0">
+                    <effect>
+                        <DropShadow color="#2521218c" />
+                    </effect>
+                </Rectangle>
+                <Label alignment="CENTER" layoutX="101.0" layoutY="11.0" text="User Info" textAlignment="CENTER" textFill="#a00839">
+                    <font>
+                        <Font name="System Bold" size="34.0" />
+                    </font>
+                    <graphic>
+                        <ImageView fitHeight="38.0" fitWidth="39.0" nodeOrientation="INHERIT">
+                            <image>
+                                <Image url="@image/information (3).png" />
+                            </image>
+                        </ImageView>
+                    </graphic>
+                </Label>
+                <Label layoutX="46.0" layoutY="212.0" prefHeight="72.0" prefWidth="200.0" text="Phone Number" textFill="#e1195c" wrapText="true">
+                    <font>
+                        <Font name="System Bold" size="20.0" />
+                    </font>
+                    <graphic>
+                        <ImageView fitHeight="34.0" fitWidth="32.0">
+                            <image>
+                                <Image url="@image/call (1).png" />
+                            </image>
+                        </ImageView>
+                    </graphic>
+                </Label>
+                <Label fx:id="fullNameLabel" layoutX="259.0" layoutY="99.0" text="Full name " textFill="#0b0ac7">
+                    <font>
+                        <Font name="Berlin Sans FB" size="19.0" />
+                    </font>
+                    <effect>
+                        <ColorAdjust brightness="-0.12" contrast="0.19" hue="-0.05" saturation="0.88" />
+                    </effect>
+                </Label>
+                <Label fx:id="UniqueNameLabel" layoutX="259.0" layoutY="165.0" text="Full name " textFill="#0b0ac7">
+                    <font>
+                        <Font name="Berlin Sans FB" size="19.0" />
+                    </font>
+                    <effect>
+                        <ColorAdjust brightness="-0.12" contrast="0.19" hue="-0.05" saturation="0.88" />
+                    </effect>
+                </Label>
+                <Label fx:id="PhoneLabel" layoutX="259.0" layoutY="237.0" text="Full name " textFill="#0b0ac7">
+                    <font>
+                        <Font name="Berlin Sans FB" size="19.0" />
+                    </font>
+                    <effect>
+                        <ColorAdjust brightness="-0.12" contrast="0.19" hue="-0.05" saturation="0.88" />
+                    </effect>
+                </Label>
+                <Label fx:id="EmailLabel" layoutX="260.0" layoutY="307.0" text="Full name " textFill="#0b0ac7">
+                    <font>
+                        <Font name="Berlin Sans FB" size="19.0" />
+                    </font>
+                    <effect>
+                        <ColorAdjust brightness="-0.12" contrast="0.19" hue="-0.05" saturation="0.88" />
+                    </effect>
+                </Label>
+                <Label fx:id="BirthdayLabel" layoutX="260.0" layoutY="377.0" text="Full name " textFill="#0b0ac7">
+                    <font>
+                        <Font name="Berlin Sans FB" size="19.0" />
+                    </font>
+                    <effect>
+                        <ColorAdjust brightness="-0.12" contrast="0.19" hue="-0.05" saturation="0.88" />
+                    </effect>
+                </Label>
+            </children>
+        </Pane>
+    </children>
+    <opaqueInsets>
+        <Insets />
+    </opaqueInsets>
+</AnchorPane>

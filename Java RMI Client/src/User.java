@@ -7,13 +7,41 @@ import java.io.Serializable;
  * Github:alaa-alkheder
  */
 public class User implements Serializable {
-    private   String FullName;
-    private   String uniqueName;
-    private   String password;
-    private   String email;
-//  private   String Name;
-//  private   String Name;
-private   String path;
+    private String FullName;
+    private String uniqueName;
+    private String password;
+    private String email;
+    private String Birthday;
+    private String phone;
+    private String gender;
+    private String path;
+
+    public String getBirthday() {
+        return Birthday;
+    }
+
+    public void setBirthday(String birthday) {
+        Birthday = birthday;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+
+
     public String getPath() {
         return path;
     }
@@ -23,9 +51,8 @@ private   String path;
     }
 
 
-    public User(String uniqueName, String password) {
-        this.uniqueName = uniqueName;
-        this.password = password;
+    public User() {
+
     }
 
     public String getFullName() {

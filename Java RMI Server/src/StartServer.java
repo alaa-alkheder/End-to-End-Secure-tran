@@ -8,14 +8,8 @@ import jxl.write.WritableWorkbook;
 import jxl.write.WriteException;
 import jxl.write.biff.RowsExceededException;
 
-import java.awt.*;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.net.MalformedURLException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.util.HashMap;
@@ -37,7 +31,7 @@ public class StartServer {
      * Print User info Name&password
      */
     static private void printUserPassword() {
-
+        System.out.println(user.size());
         user.entrySet().forEach(entry -> {
             System.out.println(entry.getKey() + " " + entry.getValue());
         });
@@ -57,11 +51,11 @@ public class StartServer {
             System.out.println(row);
             System.out.println(col);
             for (int i = 0; i < row; i++) {
-//                for (int j = 0; j < col; j++) {
-                Cell name = sheet.getCell(0, i);
-                Cell pass = sheet.getCell(1, i);
-                user.put(name.getContents(), pass.getContents());
-//                }
+                for (int j = 0; j < col; j++) {
+                    Cell name = sheet.getCell(0, i);
+                    Cell pass = sheet.getCell(1, i);
+                    user.put(name.getContents(), pass.getContents());
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -69,8 +63,6 @@ public class StartServer {
             e.printStackTrace();
         }
     }
-
-
 
 
     /**
@@ -164,9 +156,24 @@ public class StartServer {
 
     public static void main(String[] arg) throws RemoteException, MalformedURLException {
 
-//        user = (HashMap<String, User>) ois.readObject();
+        ObjectInputStream objectInputStream = null;
+        ObjectOutputStream objectOutputStream=null;
+
+        try {
+
+            objectInputStream = new ObjectInputStream(new FileInputStream(userFile));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            userProfile = (HashMap<String, User>) objectInputStream.readObject();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
         readUserPassword();
-//        printUserPassword();
+        printUserPassword();
 //        saveUserPassword();
         try {
             java.rmi.registry.LocateRegistry.createRegistry(1099);
@@ -174,5 +181,14 @@ public class StartServer {
             e.printStackTrace();
         }
         Naming.rebind("RMIServer", new Server());
+        try {
+            objectOutputStream=new ObjectOutputStream(new FileOutputStream(userFile));
+            objectOutputStream.writeObject(userProfile);
+            objectOutputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
+
+
 }
