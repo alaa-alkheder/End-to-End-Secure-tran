@@ -1,0 +1,604 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.effect.Light.Distant?>
+<?import javafx.scene.effect.Lighting?>
+<?import javafx.scene.effect.Shadow?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.shape.Line?>
+<?import javafx.scene.text.Font?>
+
+<TabPane fx:id="tabpane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="821.0" style="-fx-background-color: f0e295;" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mainScreanController">
+    <tabs>
+        <Tab fx:id="filetab" text="Files">
+            <content>
+                <AnchorPane prefHeight="600.0" prefWidth="867.0" style="-fx-border-color: c99704; -fx-border-width: 15;" stylesheets="@ListViewStyle.css">
+                    <children>
+                        <ImageView accessibleRole="TEXT" fitHeight="520.0" fitWidth="769.0" layoutX="33.0" layoutY="22.0">
+                            <image>
+                                <Image url="@image/background.png" />
+                            </image>
+                        </ImageView>
+                        <Label fx:id="internalLabel" layoutX="520.0" layoutY="361.0" prefHeight="0.0" prefWidth="199.0" text="INTERNAL" textFill="#d99714" wrapText="true">
+                            <font>
+                                <Font name="Berlin Sans FB Demi Bold" size="25.0" />
+                            </font>
+                        </Label>
+                        <ScrollPane fx:id="scrollPaneId" layoutX="57.0" layoutY="78.0" prefHeight="395.0" prefWidth="419.0">
+                            <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="395.0" prefWidth="402.0">
+                                    <children>
+                                        <ListView fx:id="list" layoutX="-26.0" layoutY="-17.0" prefHeight="432.0" prefWidth="520.0" />
+                                    </children>
+                                </AnchorPane>
+                            </content>
+                            <cursor>
+                                <Cursor fx:constant="HAND" />
+                            </cursor>
+                            <effect>
+                                <DropShadow color="#e02424" height="41.015" radius="20.93375" spread="0.38" width="44.72" />
+                            </effect>
+                        </ScrollPane>
+                        <Label fx:id="fileShaingLable" accessibleRole="TITLED_PANE" layoutX="67.0" layoutY="32.0" text="  Your file sharing" textFill="#ff4187">
+                            <font>
+                                <Font name="System Bold" size="23.0" />
+                            </font>
+                            <effect>
+                                <DropShadow color="#d665b8ae" />
+                            </effect>
+                            <graphic>
+                                <ImageView fx:id="fileShaingIcon">
+                                    <image>
+                                        <Image url="@image/folder (4).png" />
+                                    </image>
+                                    <effect>
+                                        <DropShadow color="#d665b8ae" />
+                                    </effect>
+                                </ImageView>
+                            </graphic>
+                        </Label>
+                        <Button id="uu" fx:id="UploadButton" layoutX="104.0" layoutY="495.0" mnemonicParsing="false" onAction="#UploadButtonAction" prefHeight="32.0" prefWidth="120.0" style="-fx-background-color: ffc107; -fx-border-radius: 5; -fx-border-color: c99704;" stylesheets="@ListViewStyle.css" text="Upload" textFill="#fffefe">
+                            <cursor>
+                                <Cursor fx:constant="HAND" />
+                            </cursor>
+                            <effect>
+                                <DropShadow radius="9.75" width="20.0" />
+                            </effect>
+                            <font>
+                                <Font name="System Bold" size="14.0" />
+                            </font>
+                            <graphic>
+                                <ImageView fx:id="UploadIcon" fitHeight="15.0" fitWidth="20.0">
+                                    <image>
+                                        <Image url="@image/upload.png" />
+                                    </image>
+                                </ImageView>
+                            </graphic>
+                        </Button>
+                        <Button id="dd" fx:id="DownloadButton" contentDisplay="BOTTOM" layoutX="285.0" layoutY="496.0" mnemonicParsing="false" onAction="#DownloadButtonAction" prefHeight="32.0" prefWidth="120.0" style="-fx-background-color: ffc107; -fx-border-radius: 5; -fx-border-color: c99704;" stylesheets="@ListViewStyle.css" text="  Download" textFill="#fcfcfc">
+                            <cursor>
+                                <Cursor fx:constant="HAND" />
+                            </cursor>
+                            <effect>
+                                <DropShadow radius="9.75" width="20.0" />
+                            </effect>
+                            <font>
+                                <Font name="System Bold" size="14.0" />
+                            </font>
+                        </Button>
+                        <ImageView fx:id="slackLogoImage" fitHeight="227.0" fitWidth="247.0" layoutX="506.0" layoutY="111.0">
+                            <image>
+                                <Image url="@image/Picture13.png" />
+                            </image>
+                            <effect>
+                                <DropShadow color="#b754bc" radius="13.7075" width="35.83" />
+                            </effect>
+                        </ImageView>
+                        <ImageView fx:id="downloadIcon" fitHeight="15.0" fitWidth="20.0" layoutX="294.0" layoutY="502.0">
+                            <image>
+                                <Image url="@image/download (4).png" />
+                            </image>
+                        </ImageView>
+                        <Label fx:id="driveLabel" layoutX="643.0" layoutY="353.0" text="Drive" textFill="#d84b80">
+                            <font>
+                                <Font name="Berlin Sans FB Demi Bold" size="39.0" />
+                            </font>
+                            <effect>
+                                <Lighting>
+                                    <bumpInput>
+                                        <Shadow />
+                                    </bumpInput>
+                                    <light>
+
+                                    </light>
+                                </Lighting>
+                            </effect>
+                        </Label>
+                    </children>
+                    <opaqueInsets>
+                        <Insets />
+                    </opaqueInsets>
+                </AnchorPane>
+            </content></Tab>
+        <Tab text="Users">
+            <content>
+                <AnchorPane prefHeight="200.0" prefWidth="200.0" style="-fx-border-color: c99704; -fx-border-width: 15;">
+                    <children>
+                        <ImageView accessibleRole="TEXT" fitHeight="517.0" fitWidth="773.0" layoutX="32.0" layoutY="20.0">
+                            <image>
+                                <Image url="@image/background.png" />
+                            </image>
+                        </ImageView>
+                        <ScrollPane layoutX="47.0" layoutY="102.0" prefHeight="393.0" prefWidth="342.0">
+                            <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="330.0" prefWidth="338.0">
+                                    <effect>
+                                        <DropShadow blurType="GAUSSIAN" height="77.34" radius="34.4625" spread="0.59" width="62.51" />
+                                    </effect>
+                                    <children>
+                                        <ListView fx:id="userlist" layoutX="-17.0" layoutY="-23.0" prefHeight="490.0" prefWidth="377.0" stylesheets="@ListViewStyle.css" />
+                                    </children>
+                                </AnchorPane>
+                            </content>
+                            <cursor>
+                                <Cursor fx:constant="HAND" />
+                            </cursor>
+                     <effect>
+                        <DropShadow blurType="GAUSSIAN" color="#000000c1" />
+                     </effect>
+                        </ScrollPane>
+                        <Pane layoutX="408.0" layoutY="97.0" prefHeight="393.0" prefWidth="383.0" style="-fx-background-color: #f4d987;">
+                            <children>
+                                <Button fx:id="chatButton" contentDisplay="BOTTOM" layoutX="285.0" layoutY="297.0" mnemonicParsing="false" onAction="#chatButtonAction" prefHeight="32.0" prefWidth="63.0" style="-fx-background-color: ffc107; -fx-border-color: fff; -fx-border-radius: 3;" textFill="#fcfcfc">
+                                    <cursor>
+                                        <Cursor fx:constant="HAND" />
+                                    </cursor>
+                                    <effect>
+                                        <DropShadow color="#d30d428f" height="20.13" radius="9.532499999999999" spread="0.9" width="20.0" />
+                                    </effect>
+                                    <font>
+                                        <Font name="System Bold" size="14.0" />
+                                    </font>
+                                </Button>
+                                <ImageView fitHeight="32.0" fitWidth="30.0" layoutX="245.0" layoutY="298.0" rotate="90.0">
+                                    <image>
+                                        <Image url="@image/tap (1).png" />
+                                    </image>
+                                    <effect>
+                                        <DropShadow color="#d71faf" spread="0.26" />
+                                    </effect>
+                                </ImageView>
+                                <Line endX="61.0" endY="2.0" fill="WHITE" layoutX="222.0" layoutY="76.0" startX="-80.0" startY="2.0" stroke="#fcfcfcd6" strokeLineCap="ROUND">
+                                    <effect>
+                                        <DropShadow color="WHITE" height="16.134999999999998" radius="7.30125" spread="0.78" width="15.07" />
+                                    </effect>
+                                </Line>
+                                <Label fx:id="usernameFiledLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="111.0" layoutY="26.0" prefHeight="42.0" prefWidth="190.0" textAlignment="CENTER" textFill="#1273ea">
+                                    <font>
+                                        <Font name="System Bold" size="25.0" />
+                                    </font>
+                                    <effect>
+                                        <DropShadow color="#00000048" spread="0.13" />
+                                    </effect>
+                                </Label>
+                                <ImageView fitHeight="74.0" fitWidth="80.0" layoutX="18.0" layoutY="8.0">
+                                    <image>
+                                        <Image url="@image/user (1).png" />
+                                    </image>
+                                </ImageView>
+                                <Label layoutX="34.0" layoutY="120.0" prefHeight="42.0" prefWidth="66.0" text="Email :" textFill="#e81366">
+                                    <font>
+                                        <Font name="System Bold" size="19.0" />
+                                    </font>
+                                    <effect>
+                                        <DropShadow blurType="GAUSSIAN" color="#da3ca878" spread="0.28" />
+                                    </effect>
+                                </Label>
+                                <Label layoutX="33.0" layoutY="174.0" prefHeight="42.0" prefWidth="79.0" text="Phone :" textFill="#e81366">
+                                    <font>
+                                        <Font name="System Bold" size="19.0" />
+                                    </font>
+                                    <effect>
+                                        <DropShadow blurType="GAUSSIAN" color="#da3ca878" spread="0.28" />
+                                    </effect>
+                                </Label>
+                                <Label layoutX="32.0" layoutY="232.0" prefHeight="42.0" prefWidth="120.0" text="Permission :" textFill="#e81366">
+                                    <font>
+                                        <Font name="System Bold" size="19.0" />
+                                    </font>
+                                    <effect>
+                                        <DropShadow blurType="GAUSSIAN" color="#da3ca878" spread="0.28" />
+                                    </effect>
+                                </Label>
+                                <Label layoutX="31.0" layoutY="291.0" prefHeight="42.0" prefWidth="187.0" text="Start communicate :" textFill="#e81366">
+                                    <font>
+                                        <Font name="System Bold" size="19.0" />
+                                    </font>
+                                    <effect>
+                                        <DropShadow blurType="GAUSSIAN" color="#da3ca878" spread="0.28" />
+                                    </effect>
+                                </Label>
+                                <Label fx:id="emailFiledLable" layoutX="125.0" layoutY="126.0" prefHeight="30.0" prefWidth="222.0" style="-fx-border-color: f4427e; -fx-border-radius: 5;" textFill="#1273ea">
+                                    <font>
+                                        <Font size="14.0" />
+                                    </font>
+                                </Label>
+                                <Label fx:id="phoneFiledLable" layoutX="137.0" layoutY="181.0" prefHeight="30.0" prefWidth="213.0" style="-fx-border-color: f4427e; -fx-border-radius: 5;" textFill="#1273ea">
+                                    <font>
+                                        <Font size="14.0" />
+                                    </font>
+                                </Label>
+                                <Label fx:id="permissoinFiledLable" layoutX="169.0" layoutY="240.0" prefHeight="30.0" prefWidth="183.0" style="-fx-border-color: f4427e; -fx-border-radius: 5;" textFill="#1273ea">
+                                    <font>
+                                        <Font size="14.0" />
+                                    </font>
+                                </Label>
+                                <ImageView fitHeight="29.0" fitWidth="30.0" layoutX="300.0" layoutY="299.0">
+                                    <image>
+                                        <Image url="@image/speech-bubble.png" />
+                                    </image>
+                                </ImageView>
+                            </children>
+                            <effect>
+                                <DropShadow color="#c38e14" />
+                            </effect>
+                        </Pane>
+                        <Label fx:id="userLabel" layoutX="62.0" layoutY="53.0" text="Users" textFill="#ff4187">
+                            <font>
+                                <Font name="System Bold" size="23.0" />
+                            </font>
+                            <effect>
+                                <DropShadow color="#e320b2b4" />
+                            </effect>
+                            <graphic>
+                                <ImageView fx:id="userIcon">
+                                    <image>
+                                        <Image url="@image/user.png" />
+                                    </image>
+                                </ImageView>
+                            </graphic>
+                        </Label>
+                        <Label fx:id="infoLabel" layoutX="419.0" layoutY="53.0" text="info" textFill="#1273ea">
+                            <font>
+                                <Font name="System Bold" size="23.0" />
+                            </font>
+                            <effect>
+                                <DropShadow color="#2ca5b58f" />
+                            </effect>
+                            <graphic>
+                                <ImageView fx:id="infoIcon">
+                                    <image>
+                                        <Image url="@image/information.png" />
+                                    </image>
+                                </ImageView>
+                            </graphic>
+                        </Label>
+                    </children>
+                </AnchorPane>
+            </content></Tab>
+        <Tab text="Workshops">
+            <content>
+                <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                    <children>
+                        <AnchorPane prefHeight="563.0" prefWidth="833.0" style="-fx-border-color: c99704; -fx-border-width: 15;">
+                            <children>
+                                <ImageView accessibleRole="TEXT" fitHeight="516.0" fitWidth="776.0" layoutX="32.0" layoutY="20.0">
+                                    <image>
+                                        <Image url="@image/background.png" />
+                                    </image>
+                                </ImageView>
+                                <Label fx:id="workshopLabel" layoutX="72.0" layoutY="45.0" style="-fx-text-fill: f4427e;" text="Workshops">
+                                    <font>
+                                        <Font name="System Bold" size="23.0" />
+                                    </font>
+                                    <effect>
+                                        <DropShadow color="#e320b2b4" />
+                                    </effect>
+                                    <graphic>
+                                        <ImageView>
+                                            <image>
+                                                <Image url="@image/people (1).png" />
+                                            </image>
+                                        </ImageView>
+                                    </graphic>
+                                </Label>
+                                <Label fx:id="createWorkshopLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="529.0" layoutY="306.0" prefHeight="41.0" prefWidth="233.0" text="Creat new workshop" textFill="#f2f2f2" wrapText="true">
+                                    <font>
+                                        <Font name="System Bold" size="23.0" />
+                                    </font>
+                                    <effect>
+                                        <DropShadow color="#e421b7fc" spread="0.75" />
+                                    </effect>
+                                </Label>
+                                <ImageView fx:id="addWorkShopLogo" fitHeight="228.0" fitWidth="256.0" layoutX="496.0" layoutY="65.0">
+                                    <image>
+                                        <Image url="@image/Picture222.png" />
+                                    </image>
+                                </ImageView>
+                                <Button fx:id="addWorkhopButton" contentDisplay="BOTTOM" layoutX="585.0" layoutY="377.0" mnemonicParsing="false" onAction="#addWorkhopButtonAction" prefHeight="32.0" prefWidth="120.0" style="-fx-background-color: f4427e; -fx-border-radius: 5; -fx-border-color: fff;" text="     ADD" textFill="#fcfcfc">
+                                    <cursor>
+                                        <Cursor fx:constant="HAND" />
+                                    </cursor>
+                                    <effect>
+                                        <DropShadow color="#ae5d9173" height="16.16" radius="8.54" spread="0.73" width="20.0" />
+                                    </effect>
+                                    <font>
+                                        <Font name="System Bold" size="14.0" />
+                                    </font>
+                                </Button>
+                                <ImageView fitHeight="15.0" fitWidth="20.0" layoutX="613.0" layoutY="386.0">
+                                    <image>
+                                        <Image url="@image/Picture33.png" />
+                                    </image>
+                                    <effect>
+                                        <DropShadow color="WHITE" />
+                                    </effect>
+                                </ImageView>
+                                <ScrollPane layoutX="69.0" layoutY="95.0" prefHeight="407.0" prefWidth="422.0">
+                                    <content>
+                                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="407.0" prefWidth="416.0">
+                                            <children>
+                                                <ListView fx:id="workshoplist" layoutX="-22.0" layoutY="-23.0" prefHeight="471.0" prefWidth="509.0" stylesheets="@ListViewStyle.css" />
+                                            </children>
+                                        </AnchorPane>
+                                    </content>
+                                    <cursor>
+                                        <Cursor fx:constant="HAND" />
+                                    </cursor>
+                                    <effect>
+                                        <DropShadow blurType="GAUSSIAN" color="#000000c1" />
+                                    </effect>
+                                </ScrollPane>
+                            </children>
+                        </AnchorPane>
+                    </children>
+                </AnchorPane>
+            </content></Tab>
+        <Tab text="Chat">
+            <content>
+                <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                    <children>
+                        <AnchorPane prefHeight="107.0" prefWidth="822.0" style="-fx-background-color: cc960d;">
+                            <children>
+                                <Label fx:id="internalLabel2" alignment="CENTER" layoutX="303.0" layoutY="20.0" prefHeight="73.0" prefWidth="262.0" text="INTERNAL" textFill="#f8f8f8" wrapText="true">
+                                    <font>
+                                        <Font name="Berlin Sans FB Demi Bold" size="30.0" />
+                                    </font>
+                                </Label>
+                                <ImageView fitHeight="73.0" fitWidth="79.0" layoutX="279.0" layoutY="20.0">
+                                    <image>
+                                        <Image url="@image/Picture13.png" />
+                                    </image>
+                                </ImageView>
+                                <Label fx:id="internalLabel1" layoutX="509.0" layoutY="24.0" prefHeight="57.0" prefWidth="114.0" text="Chat" textFill="#110f8a" wrapText="true">
+                                    <font>
+                                        <Font name="Berlin Sans FB Demi Bold" size="50.0" />
+                                    </font>
+                                    <effect>
+                                        <Lighting>
+                                            <bumpInput>
+                                                <Shadow />
+                                            </bumpInput>
+                                            <light>
+                                                <Light.Distant />
+                                            </light>
+                                        </Lighting>
+                                    </effect>
+                                </Label>
+                                <MenuButton fx:id="statusComboBox" layoutX="22.0" layoutY="75.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="71.0" text="Online">
+                                    <items>
+                                        <MenuItem fx:id="busy" mnemonicParsing="false" onAction="#busyAction" text="Busy" />
+                                        <MenuItem fx:id="away" mnemonicParsing="false" onAction="#AwayAction" text="Away" />
+                                        <MenuItem fx:id="online" mnemonicParsing="false" onAction="#onlineAction" text="Online" />
+                                    </items>
+                                </MenuButton>
+                                <Label fx:id="usernameLabel" layoutX="97.0" layoutY="18.0" prefHeight="64.0" prefWidth="130.0" text="Dominic Heal" textFill="WHITE" wrapText="true">
+                                    <font>
+                                        <Font name="System Bold" size="17.0" />
+                                    </font>
+                                    <padding>
+                                        <Insets top="10.0" />
+                                    </padding>
+                                </Label>
+                                <ImageView fx:id="userImageView" fitHeight="69.0" fitWidth="59.0" layoutX="23.0" layoutY="7.0" pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                        <Image url="@image/default.png" />
+                                    </image>
+                                </ImageView>
+                                <Label fx:id="lumbLabel" layoutX="67.0" layoutY="51.0">
+                                    <graphic>
+                                        <ImageView fx:id="statusLumb">
+                                            <image>
+                                                <Image url="@image/online.png" />
+                                            </image>
+                                        </ImageView>
+                                    </graphic>
+                                </Label>
+                            </children>
+                        </AnchorPane>
+                        <AnchorPane layoutX="6.0" layoutY="112.0" prefHeight="467.0" prefWidth="217.0">
+                            <children>
+                                <ListView fx:id="userList" focusTraversable="false" layoutX="-32.0" layoutY="44.0" maxHeight="1.7976931348623157E308" prefHeight="451.0" prefWidth="270.0" style="-fx-border-image-width: 0; -fx-background-color: c1c3da;" stylesheets="@massageList.css">
+                                    <effect>
+                                        <DropShadow color="#8a8383" />
+                                    </effect>
+                                </ListView>
+                                <HBox fx:id="onlineUsersHbox" layoutX="-1.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="50.0" prefWidth="210.0">
+                                    <children>
+                                        <Label prefHeight="50.0" prefWidth="124.0" text="Online Users:" textAlignment="CENTER" textFill="#509e32">
+                                            <font>
+                                                <Font name="SansSerif Regular" size="14.0" />
+                                            </font>
+                                            <padding>
+                                                <Insets left="10.0" />
+                                            </padding>
+                                            <opaqueInsets>
+                                                <Insets bottom="10.0" />
+                                            </opaqueInsets>
+                                            <effect>
+                                                <Lighting diffuseConstant="1.26" specularConstant="1.7" specularExponent="31.16" surfaceScale="9.76">
+                                                    <bumpInput>
+                                                        <Shadow />
+                                                    </bumpInput>
+                                                    <light>
+                                                        <Light.Distant azimuth="360.0" color="#21db1fe0" elevation="78.49" />
+                                                    </light>
+                                                </Lighting>
+                                            </effect>
+                                        </Label>
+                                        <Label fx:id="onlineCountLabel" prefHeight="48.0" prefWidth="88.0" text="0" textFill="#fc6747">
+                                            <opaqueInsets>
+                                                <Insets />
+                                            </opaqueInsets>
+                                            <font>
+                                                <Font name="SansSerif Regular" size="21.0" />
+                                            </font>
+                                        </Label>
+                                    </children>
+                                    <effect>
+                                        <Lighting diffuseConstant="1.77" specularConstant="1.09" surfaceScale="5.45">
+                                            <bumpInput>
+                                                <Shadow>
+                                                    <input>
+                                                        <DropShadow />
+                                                    </input>
+                                                </Shadow>
+                                            </bumpInput>
+                                            <light>
+                                                <Light.Distant color="#5bd74e" />
+                                            </light>
+                                        </Lighting>
+                                    </effect>
+                                </HBox>
+                                <Label contentDisplay="BOTTOM" prefHeight="50.0" prefWidth="124.0" text="Online Users:" textAlignment="CENTER" textFill="#509e32">
+                                    <font>
+                                        <Font name="SansSerif Regular" size="14.0" />
+                                    </font>
+                                    <padding>
+                                        <Insets left="10.0" />
+                                    </padding>
+                                    <opaqueInsets>
+                                        <Insets bottom="10.0" />
+                                    </opaqueInsets>
+                                    <effect>
+                                        <Lighting diffuseConstant="1.26" specularConstant="1.7" specularExponent="31.16" surfaceScale="9.76">
+                                            <bumpInput>
+                                                <Shadow />
+                                            </bumpInput>
+                                            <light>
+                                                <Light.Distant azimuth="0.0" color="#2f8a2de0" elevation="78.49" />
+                                            </light>
+                                        </Lighting>
+                                    </effect>
+                                </Label>
+                            </children>
+                        </AnchorPane>
+                        <AnchorPane layoutX="248.0" layoutY="108.0" prefHeight="420.0" prefWidth="602.0">
+                            <children>
+                                <ScrollPane layoutX="-29.0" layoutY="-1.0" prefHeight="418.0" prefWidth="598.0">
+                                    <content>
+                                        <ListView fx:id="chatPaneList" prefHeight="2000.0" prefWidth="567.0" stylesheets="@massageList.css" />
+                                    </content>
+                                </ScrollPane>
+                                <ImageView fitHeight="399.0" fitWidth="451.0" layoutX="50.0" layoutY="15.0" nodeOrientation="INHERIT" opacity="0.34">
+                                    <image>
+                                        <Image url="@image/Picture13.png" />
+                                    </image>
+                                </ImageView>
+                                <HBox layoutX="-30.0" layoutY="417.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="100.0" prefHeight="43.0" prefWidth="602.0">
+                                    <children>
+                                        <TextArea fx:id="messageTextArea" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="100.0" nodeOrientation="LEFT_TO_RIGHT" onKeyPressed="#sendMethod" prefHeight="43.0" prefWidth="415.0" promptText="Enter Message..." scaleShape="false" HBox.hgrow="ALWAYS">
+                                            <font>
+                                                <Font name="SansSerif Regular" size="14.0" />
+                                            </font>
+                                            <effect>
+                                                <DropShadow color="#8a8383" />
+                                            </effect>
+                                        </TextArea>
+                                        <Button fx:id="sendButton" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#sendButtonAction" prefHeight="43.0" prefWidth="140.0" scaleShape="false" style="-fx-background-color: cc960d; -fx-border-color: fff; -fx-border-radius: 5;" text="Send" textAlignment="CENTER" textFill="#f2f2f2" HBox.hgrow="NEVER">
+                                            <effect>
+                                                <DropShadow color="#807c7c" />
+                                            </effect>
+                                            <font>
+                                                <Font name="System Bold" size="20.0" />
+                                            </font>
+                                        </Button>
+                                        <Button fx:id="recordButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMousePressed="#RecodingNow" onMouseReleased="#StopRecording" style="-fx-background-color: cc960d; -fx-border-color: fff; -fx-border-radius: 5;">
+                                            <graphic>
+                                                <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                                                    <image>
+                                                        <Image url="@image/microphone.png" />
+                                                    </image>
+                                                </ImageView>
+                                            </graphic>
+                                            <effect>
+                                                <DropShadow color="#807c7c" />
+                                            </effect>
+                                        </Button>
+                                    </children>
+                                </HBox>
+                            </children>
+                        </AnchorPane>
+                    </children>
+                </AnchorPane>
+            </content>
+        </Tab>
+        <Tab text="Logout">
+            <content>
+                <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                    <children>
+                        <ImageView accessibleRole="TEXT" fitHeight="568.0" fitWidth="835.0">
+                            <image>
+                                <Image url="@image/background.png" />
+                            </image>
+                        </ImageView>
+                        <Pane layoutX="260.0" layoutY="10.0" prefHeight="303.0" prefWidth="321.0">
+                            <children>
+                                <ImageView fitHeight="303.0" fitWidth="305.0" layoutY="61.0">
+                                    <image>
+                                        <Image url="@image/Picture13.png" />
+                                    </image>
+                                </ImageView>
+                            </children>
+                        </Pane>
+                        <Label layoutX="332.0" layoutY="372.0" text="Thank You for using internal Drive" textFill="#1579ab">
+                            <font>
+                                <Font name="System Bold" size="12.0" />
+                            </font>
+                        </Label>
+                        <Button id="dd" fx:id="logoutButton" contentDisplay="BOTTOM" layoutX="366.0" layoutY="455.0" mnemonicParsing="false" onAction="#logoutButtonAction" prefHeight="32.0" prefWidth="120.0" style="-fx-background-color: ffc107; -fx-border-radius: 5; -fx-border-color: c99704;" stylesheets="@ListViewStyle.css" text="Logout" textFill="#fcfcfc">
+                            <cursor>
+                                <Cursor fx:constant="HAND" />
+                            </cursor>
+                            <effect>
+                                <DropShadow radius="9.75" width="20.0" />
+                            </effect>
+                            <font>
+                                <Font name="System Bold" size="14.0" />
+                            </font>
+                        </Button>
+                        <Label layoutX="326.0" layoutY="540.0" text="connect us :www.Internal Drive .com">
+                            <font>
+                                <Font name="System Bold" size="12.0" />
+                            </font>
+                        </Label>
+                    </children>
+                </AnchorPane>
+            </content></Tab>
+    </tabs>
+</TabPane>

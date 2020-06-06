@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.effect.ColorAdjust?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="605.0" prefWidth="600.0" style="-fx-border-color: c99704; -fx-border-width: 15;" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="workshopController">
+    <stylesheets>
+        <URL value="@ListViewStyle.css" />
+    </stylesheets>
+    <children>
+        <ImageView fx:id="backgroundImage" fitHeight="515.0" fitWidth="808.0" layoutX="46.0" layoutY="69.0" opacity="0.85">
+            <image>
+                <Image url="@image/Picture114.png" />
+            </image>
+        </ImageView>
+        <ScrollPane fx:id="scrollPaneId" layoutX="73.0" layoutY="204.0" prefHeight="366.0" prefWidth="325.0">
+            <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="364.0" prefWidth="314.0">
+                    <children>
+                        <ListView fx:id="userSelectedList1" layoutX="6.0" layoutY="2.0" prefHeight="360.0" prefWidth="325.0" stylesheets="@ListViewStyle.css">
+                            <cursor>
+                                <Cursor fx:constant="DEFAULT" />
+                            </cursor></ListView>
+                    </children>
+                </AnchorPane>
+            </content>
+            <effect>
+                <DropShadow />
+            </effect>
+        </ScrollPane>
+        <ScrollPane fx:id="scrollPaneId1" layoutX="488.0" layoutY="201.0" prefHeight="366.0" prefWidth="325.0">
+            <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="364.0" prefWidth="314.0">
+                    <children>
+                        <ListView fx:id="fileSelectedList1" prefHeight="360.0" prefWidth="325.0" stylesheets="@ListViewStyle.css" />
+                    </children>
+                </AnchorPane>
+            </content>
+            <effect>
+                <DropShadow />
+            </effect>
+        </ScrollPane>
+        <Button fx:id="addfileButton" layoutX="576.0" layoutY="580.0" mnemonicParsing="false" onAction="#addFileButtonAction" prefHeight="35.0" prefWidth="162.0" style="-fx-background-color: #32119d; -fx-border-radius: 5; -fx-border-color: c99704;" text="Add File" textFill="#fffefe">
+            <cursor>
+                <Cursor fx:constant="HAND" />
+            </cursor>
+            <effect>
+                <DropShadow radius="9.75" width="20.0" />
+            </effect>
+            <font>
+                <Font name="System Bold" size="14.0" />
+            </font>
+        </Button>
+        <Button fx:id="addworkshopButton" contentDisplay="BOTTOM" defaultButton="true" layoutX="145.0" layoutY="581.0" mnemonicParsing="false" onAction="#addworkshopButtonAction" prefHeight="35.0" prefWidth="162.0" style="-fx-background-color: #cd3f73; -fx-border-radius: 5; -fx-border-color: c99704;" text="      Creat Workshop" textFill="#fcfcfc">
+            <cursor>
+                <Cursor fx:constant="HAND" />
+            </cursor>
+            <effect>
+                <DropShadow radius="9.75" width="20.0" />
+            </effect>
+            <font>
+                <Font name="System Bold" size="14.0" />
+            </font>
+        </Button>
+        <Label layoutX="89.0" layoutY="168.0" text="User selected" textFill="#cd3f73">
+            <font>
+                <Font name="System Bold" size="23.0" />
+            </font>
+            <graphic>
+                <ImageView>
+                    <image>
+                        <Image url="@image/user.png" />
+                    </image>
+                </ImageView>
+            </graphic>
+        </Label>
+        <Label fx:id="selectedfileLabel" layoutX="493.0" layoutY="166.0" text="File selected" textFill="#32119d">
+            <font>
+                <Font name="System Bold" size="23.0" />
+            </font>
+            <graphic>
+                <ImageView>
+                    <image>
+                        <Image url="@image/approval.png" />
+                    </image>
+                </ImageView>
+            </graphic>
+        </Label>
+        <ImageView fitHeight="24.0" fitWidth="24.0" layoutX="600.0" layoutY="588.0">
+            <image>
+                <Image url="@image/add (1).png" />
+            </image>
+        </ImageView>
+        <Pane layoutX="36.0" layoutY="26.0" prefHeight="111.0" prefWidth="811.0" style="-fx-background-color: e7d39e;">
+            <children>
+                <Label fx:id="workshopNameLabel" layoutX="10.0" layoutY="72.0" text="Workshop Name" textFill="#c99609">
+                    <font>
+                        <Font name="System Bold" size="19.0" />
+                    </font>
+                    <effect>
+                        <ColorAdjust brightness="-0.12" contrast="0.19" hue="-0.05" saturation="0.88" />
+                    </effect>
+                </Label>
+                <Label fx:id="workshopidLabel" layoutX="18.0" layoutY="23.0" text="Workshop ID" textFill="#c99609">
+                    <font>
+                        <Font name="System Bold" size="19.0" />
+                    </font>
+                    <effect>
+                        <ColorAdjust brightness="-0.12" contrast="0.19" hue="-0.05" saturation="0.88" />
+                    </effect>
+                </Label>
+                <TextField fx:id="textFailedWorkshopName" layoutX="173.0" layoutY="70.0" prefHeight="30.0" prefWidth="250.0" promptText="workshop 1" style="-fx-font-size: 0000;">
+                    <effect>
+                        <DropShadow color="#c99609" spread="0.52" />
+                    </effect>
+                    <font>
+                        <Font size="15.0" />
+                    </font>
+                </TextField>
+                <TextField fx:id="textFiledWorkshopID" layoutX="174.0" layoutY="22.0" prefHeight="30.0" prefWidth="250.0" promptText="#9536">
+                    <effect>
+                        <DropShadow color="#c99609" spread="0.52" />
+                    </effect>
+                    <font>
+                        <Font size="15.0" />
+                    </font>
+                </TextField>
+                <CheckBox fx:id="checkBoxPrivate" layoutX="558.0" layoutY="71.0" mnemonicParsing="false" text="Private" textFill="#826207">
+                    <font>
+                        <Font name="System Bold" size="20.0" />
+                    </font>
+                    <effect>
+                        <DropShadow color="#c99609" spread="0.34" />
+                    </effect>
+                </CheckBox>
+                <Label fx:id="workshopNameLabel1" layoutX="439.0" layoutY="6.0" prefHeight="61.0" prefWidth="103.0" text="WorkshopPassword" textFill="#c99609" wrapText="true">
+                    <font>
+                        <Font name="System Bold" size="19.0" />
+                    </font>
+                    <effect>
+                        <ColorAdjust brightness="-0.12" contrast="0.19" hue="-0.05" saturation="0.88" />
+                    </effect>
+                </Label>
+                <PasswordField fx:id="workshopPasswordTextTield" layoutX="549.0" layoutY="21.0" prefHeight="30.0" prefWidth="254.0">
+                    <effect>
+                        <DropShadow color="#c99609" spread="0.51" />
+                    </effect>
+                </PasswordField>
+            </children>
+            <effect>
+                <DropShadow color="#d39c03" spread="0.51" />
+            </effect>
+        </Pane>
+        <ImageView fitHeight="28.0" fitWidth="32.0" layoutX="149.0" layoutY="583.0">
+            <image>
+                <Image url="@image/addworkshop.png" />
+            </image>
+        </ImageView>
+    </children>
+    <opaqueInsets>
+        <Insets />
+    </opaqueInsets>
+</AnchorPane>
