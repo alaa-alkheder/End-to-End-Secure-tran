@@ -70,7 +70,7 @@ public class workShopInfoController implements Initializable {
                 label = new Label("user " + i);
                 permissionLAbel = new Label("Normal USer ");
                 label.setStyle("-fx-font:normal bold 14px 'System';");
-                label.setGraphic(new ImageView(new Image(new FileInputStream("C:\\Users\\A.Ibrahim\\IdeaProjects\\untitled2\\src\\image\\user.png"))));
+                label.setGraphic(new ImageView(new Image(new FileInputStream("../Java RMI Client/src/image/user.png"))));
 
             } catch (FileNotFoundException ex) {
                 Logger.getLogger(mainScreanController.class.getName()).log(Level.SEVERE, null, ex);
@@ -80,7 +80,7 @@ public class workShopInfoController implements Initializable {
 
             try {
 
-                info = new ImageView(new Image(new FileInputStream("C:\\Users\\A.Ibrahim\\IdeaProjects\\untitled2\\src\\image\\information.png")));
+                info = new ImageView(new Image(new FileInputStream("../Java RMI Client/src/image/information.png")));
 
             } catch (FileNotFoundException ex) {
                 Logger.getLogger(mainScreanController.class.getName()).log(Level.SEVERE, null, ex);

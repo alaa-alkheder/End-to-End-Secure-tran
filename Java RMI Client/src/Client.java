@@ -4,6 +4,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.LinkedList;
 import java.util.Scanner;
 
 /**
@@ -14,15 +15,16 @@ import java.util.Scanner;
  */
 public class Client extends UnicastRemoteObject implements DriveInterface, Runnable {
     private static final long serialVersionUID = 1L;
-  static  DriveInterface server;
+    static DriveInterface server;
+    static Client client;
     private String ClientName;
     boolean chkExit = true;
     boolean chkLog = false;
 
     protected Client(DriveInterface chatinterface) throws RemoteException {
 
-        this.server = chatinterface;
-
+        server = chatinterface;
+        client = this;
 //        System.out.println(server.registerUser(null));
 //        System.out.println(server.registerUser(null));
 //        this.ClientName = clientname;
@@ -36,29 +38,29 @@ public class Client extends UnicastRemoteObject implements DriveInterface, Runna
 //        server.ChangePassword(u);
 //        server.downloadFile();
 //        server.UpLoadFile(x);
-//        server.showAllFile();
-//        System.out.println(server.downloadFile());
+//        LinkedList<String>ss= (LinkedList<String>) server.showAllFile();
+//        System.out.println (String.valueOf(ss.get(0)));
+        //        System.out.println(server.downloadFile());
     }
-static public boolean soso() throws RemoteException {
-        return server.checkClientCredintials(server,"alaa17","17");
-}
+
+
+
     public void sendFileToServer(String message) throws RemoteException {
-        FileDialog dialog = new FileDialog((Frame)null, "Select File to Open");
+        FileDialog dialog = new FileDialog((Frame) null, "Select File to Open");
         dialog.setMode(FileDialog.LOAD);
         dialog.setVisible(true);
-        String path = dialog.getDirectory()+dialog.getFile();
+        String path = dialog.getDirectory() + dialog.getFile();
         System.out.println(path);
-       if (dialog.getFile()==null)
-       {
-           System.out.println("we dont select any file");
-           return;
-       }
+        if (dialog.getFile() == null) {
+            System.out.println("we dont select any file");
+            return;
+        }
         File f1 = new File(path);
-       int fileSize=0;
-       int timer=0;
+        int fileSize = 0;
+        int timer = 0;
         try {
-       fileSize= (int) (Files.size(Paths.get(path))/1024/1024)+1;
-       timer=fileSize;
+            fileSize = (int) (Files.size(Paths.get(path)) / 1024 / 1024) + 1;
+            timer = fileSize;
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -79,7 +81,7 @@ static public boolean soso() throws RemoteException {
         }
         while (mylen > 0) {
             //timer for Upload
-            System.out.println("Done Upload File Input Stream ..."+ --timer);
+            System.out.println("Done Upload File Input Stream ..." + --timer);
             server.UpLoadFile(f1.getName(), mydata, mylen);
             try {
                 mylen = in.read(mydata);
@@ -90,13 +92,17 @@ static public boolean soso() throws RemoteException {
         String extension = "";
         if (path.contains("."))
             extension = path.substring(path.lastIndexOf("."));
-        server.addFileInfo(f1.getName(),fileSize,extension);
+        server.addFileInfo(f1.getName(), fileSize, extension);
 
     }
 
-    public void sendMessageToClient(String message) throws RemoteException {
-        System.out.println(message);
+
+
+    @Override
+    public boolean shareFile(String fileName, LinkedList<String> name) throws RemoteException {
+        return false;
     }
+
 
     @Override
     public Boolean registerUser(User user) throws RemoteException {
@@ -120,6 +126,11 @@ static public boolean soso() throws RemoteException {
     }
 
     @Override
+    public String downloadFileInfo() throws RemoteException {
+        return "";
+    }
+
+    @Override
     public void sendFileToClient(String FileName) throws RemoteException {
 
     }
@@ -135,21 +146,22 @@ static public boolean soso() throws RemoteException {
     }
 
     @Override
-    public Object downloadFile(String filename, byte[] data, int len) throws RemoteException {
-        try{
+    public void downloadFile(String filename, byte[] data, int len) throws RemoteException {
+        System.out.println("DDDDDDDDDD");
+        try {
 
-            File f=new File(filename);
+            File f = new File(filename);
             f.createNewFile();
-            FileOutputStream out=new FileOutputStream(f,true);
-            out.write(data,0,len);
+            FileOutputStream out = new FileOutputStream(f, true);
+            out.write(data, 0, len);
             out.flush();
             out.close();
             //timer for download
             System.out.println("Done writing data...");
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        return null;
+
     }
 
 
@@ -159,11 +171,26 @@ static public boolean soso() throws RemoteException {
     }
 
     @Override
-    public String[] showAllUser() throws RemoteException {
+    public Object showAllUser() throws RemoteException {
         return new String[0];
     }
 
     public void broadcastMessage(String clientname, String message) throws RemoteException {
+    }
+
+    @Override
+    public void sendMessageToClient(int id, String message) throws RemoteException {
+        switch (id)
+        {
+            //test Connection
+            case 0:{
+                System.out.println(message);
+            }
+            //Send new File to User
+            case 1:{
+                System.out.println(message);
+            }
+        }
     }
 
     public boolean checkClientCredintials(DriveInterface chatinterface, String clientname, String password) throws RemoteException {
@@ -179,34 +206,37 @@ static public boolean soso() throws RemoteException {
         System.out.println("\n~~ Enter 1 to log in ~~\n");
         System.out.println("\n~~ Enter 2 to Sign up ~~\n");
 
-        switch (2) {
-            //creat new account
-            case 1: {
+        switch (1) {
+            //Login
+                      case 1: {
                 System.out.print("Enter The Name : ");
                 clientName = scanner.nextLine();
-                System.out.print("Enter The Password : ");
-                clientPassword = scanner.nextLine();
+//                System.out.print("Enter The Password : ");
+//                clientPassword = scanner.nextLine();
 
                 try {
-                    chkLog = server.checkClientCredintials(server, clientName, clientPassword);
+                    System.out.println(server.checkClientCredintials(server, clientName, clientPassword)); ;
+                    LinkedList<String > ss=new LinkedList<String >();
+                    ss.add("s");
+                    server.shareFile("Compiler.zip",ss);
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 }
                 break;
             }
-            //login User
+            //Sigin User
             case 2: {
                 System.out.print("Enter The Name : ");
                 clientName = scanner.nextLine();
                 System.out.print("Enter The Password : ");
                 clientPassword = scanner.nextLine();
                 Boolean test = null;
-//                try {
-//                    //true the user is booked up
-//                    test = server.testUserName(clientName);
-//                } catch (RemoteException e) {
-//                    e.printStackTrace();
-//                }
+                try {
+                    //true the user is booked up
+                    test = server.testUserName(clientName);
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
                 if (true) {
 
                     User user = new User();
@@ -227,27 +257,21 @@ static public boolean soso() throws RemoteException {
         }
 
         System.out.println("\nConnecting To RMI Server...\n");
-        try {
-            server.sendFileToClient("");
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
+//        try {
+////            server.sendFileToClient("");
+//        } catch (RemoteException e) {
+//            e.printStackTrace();
+//        }
 
         if (chkLog) {
             System.out.println("Successfully Connected To RMI Server");
-            while (chkExit){
+            while (chkExit) {
 
 
-
-return;
+                return;
 
 
             }
-
-
-
-
-
 
 
 //            System.out.println("NOTE : Type LOGOUT to Exit From The Service");

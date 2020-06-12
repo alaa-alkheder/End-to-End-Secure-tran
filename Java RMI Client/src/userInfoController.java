@@ -23,23 +23,24 @@ public class userInfoController implements Initializable {
     /**
      * Initializes the controller class.
      */
+
     @FXML
     private ImageView backgroundImage;
 
     @FXML
-    private Label fullNameLabel;
+    public Label fullNameLabel;
 
     @FXML
-    private Label UniqueNameLabel;
+    public Label UniqueNameLabel;
 
     @FXML
-    private ScrollPane scrollPaneId;
+    public Label PhoneLabel;
 
     @FXML
-    private ListView<?> usersWorkshop;
+    public Label EmailLabel;
 
     @FXML
-    private Label UniqueNameLabel1;
+    public Label BirthdayLabel;
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO

@@ -10,6 +10,8 @@ import jxl.write.biff.RowsExceededException;
 
 import java.io.*;
 import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.util.HashMap;
@@ -57,6 +59,7 @@ public class StartServer {
                     user.put(name.getContents(), pass.getContents());
                 }
             }
+            workbook.close();
         } catch (IOException e) {
             e.printStackTrace();
         } catch (BiffException e) {
@@ -68,9 +71,12 @@ public class StartServer {
     /**
      * save User info (Name&password) and save in the HashMap
      */
-    static private void saveUserPassword() {
-        File f1 = new File("D:\\recUser.xls");
+    static void saveUserPassword() {
+        File f1 = new File("D:\\User.xls");
+
         try {
+            f1.delete();
+            f1.createNewFile();
             WritableWorkbook workbook = Workbook.createWorkbook(f1);
             WritableSheet writableSheet = workbook.createSheet("temp", 0);
             AtomicInteger i = new AtomicInteger();
@@ -137,7 +143,6 @@ public class StartServer {
             if (entry.getKey().equals(name))
                 if (entry.getValue().equals(pass))
                     return true;
-//            System.out.println(entry.getKey() + " : " + entry.getValue());
         }
         return false;
     }
@@ -149,15 +154,45 @@ public class StartServer {
         for (HashMap.Entry<String, String> entry : user.entrySet()) {
             if (entry.getKey().equals(name))
                 return true;
-//            System.out.println(entry.getKey() + " : " + entry.getValue());
         }
         return false;
     }
 
-    public static void main(String[] arg) throws RemoteException, MalformedURLException {
+    static void deleteAllUser() {
 
+        try {
+            Files.deleteIfExists(Paths.get("D:\\user.xLs"));
+            Files.deleteIfExists(Paths.get("..\\Java RMI Server\\userFile"));
+            Files.deleteIfExists(Paths.get("..\\Java RMI Server\\user"));
+            File f1 = new File("D:\\user.xLs");
+            File f2 = new File("..\\Java RMI Server\\userFile");
+            File f3 = new File("..\\Java RMI Server\\user");
+            f1.createNewFile();
+            f2.mkdir();
+            f3.createNewFile();
+            saveUserObject();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    static void saveUserObject() {
+        try {
+
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(userFile));
+            objectOutputStream.writeObject(userProfile);
+            objectOutputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void main(String[] arg) throws RemoteException, MalformedURLException {
+//        deleteAllUser();
         ObjectInputStream objectInputStream = null;
-        ObjectOutputStream objectOutputStream=null;
+
 
         try {
 
@@ -181,13 +216,7 @@ public class StartServer {
             e.printStackTrace();
         }
         Naming.rebind("RMIServer", new Server());
-        try {
-            objectOutputStream=new ObjectOutputStream(new FileOutputStream(userFile));
-            objectOutputStream.writeObject(userProfile);
-            objectOutputStream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
     }
 
 

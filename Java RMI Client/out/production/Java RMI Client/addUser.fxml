@@ -17,11 +17,11 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="554.0" prefWidth="884.0" style="-fx-border-color: c99704; -fx-border-width: 15;" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="javafxapplication6.addUserController">
+<AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="554.0" prefWidth="884.0" style="-fx-border-color: c99704; -fx-border-width: 15;" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="addUserController">
     <children>
         <ImageView fx:id="backgroundImage" fitHeight="515.0" fitWidth="808.0" layoutX="46.0" layoutY="22.0" opacity="0.85">
             <image>
-                <Image url="@../image/Picture114.png" />
+                <Image url="@/image/Picture114.png" />
             </image>
         </ImageView>
         <ScrollPane fx:id="scrollPaneId" layoutX="63.0" layoutY="89.0" prefHeight="425.0" prefWidth="325.0">
@@ -43,7 +43,7 @@
             <graphic>
                 <ImageView>
                     <image>
-                        <Image url="@../image/user.png" />
+                        <Image url="@/image/user.png" />
                     </image>
                 </ImageView>
             </graphic>
@@ -99,7 +99,7 @@
                 </Button>
                 <ImageView fitHeight="116.0" fitWidth="128.0" layoutX="9.0" layoutY="7.0">
                     <image>
-                        <Image url="@../image/user (1).png" />
+                        <Image url="@/image/user (1).png" />
                     </image>
                 </ImageView>
             </children>

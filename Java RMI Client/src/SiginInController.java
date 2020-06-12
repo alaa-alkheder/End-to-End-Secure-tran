@@ -56,20 +56,12 @@ public class SiginInController implements Initializable {
     private Button RegisterButton;
 
 
-    @FXML
-    void RegisterButtonAction(ActionEvent event) throws IOException {
-        Parent root = FXMLLoader.load(getClass().getResource("sigin up.fxml"));
-        Stage stage=new Stage();
-        Scene scene = new Scene(root);
-        scene.getStylesheets().add(getClass().getResource("ListViewStyle.css").toExternalForm());
-        stage.setScene(scene);
-        stage.show();
-        connectButton.getScene().getWindow().hide();
-    }
+
+
 
     @FXML
     void loginButtonAction(ActionEvent event) throws IOException {
-        if (Client.server.checkClientCredintials(Client.server, usernameTextfield.getText(), passwordtextfield.getText().toString() )) {
+        if (Client.server.checkClientCredintials(Client.client, usernameTextfield.getText(), passwordtextfield.getText())) {
             Parent root1 = FXMLLoader.load(getClass().getResource("mainScrean.fxml"));
             Stage stage1 = new Stage();
             Scene scene1 = new Scene(root1);
@@ -86,4 +78,13 @@ public class SiginInController implements Initializable {
         // TODO
     }
 
+    public void RegisterButtonAction(ActionEvent actionEvent) throws IOException {
+        Parent root1 = FXMLLoader.load(getClass().getResource("sigin up.fxml"));
+        Stage stage1 = new Stage();
+        Scene scene1 = new Scene(root1);
+        scene1.getStylesheets().add(getClass().getResource("ListViewStyle.css").toExternalForm());
+        stage1.setScene(scene1);
+        stage1.show();
+        connectButton.getScene().getWindow().hide();
+    }
 }

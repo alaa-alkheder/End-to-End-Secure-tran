@@ -25,7 +25,7 @@
     <children>
         <ImageView fx:id="backgroundImage" fitHeight="515.0" fitWidth="808.0" layoutX="46.0" layoutY="69.0" opacity="0.85">
             <image>
-                <Image url="@image/Picture114.png" />
+                <Image url="@/image/Picture114.png" />
             </image>
         </ImageView>
         <ScrollPane fx:id="scrollPaneId" layoutX="73.0" layoutY="204.0" prefHeight="366.0" prefWidth="325.0">
@@ -84,7 +84,7 @@
             <graphic>
                 <ImageView>
                     <image>
-                        <Image url="@image/user.png" />
+                        <Image url="@/image/user.png" />
                     </image>
                 </ImageView>
             </graphic>
@@ -96,19 +96,19 @@
             <graphic>
                 <ImageView>
                     <image>
-                        <Image url="@image/approval.png" />
+                        <Image url="@/image/approval.png" />
                     </image>
                 </ImageView>
             </graphic>
         </Label>
         <ImageView fitHeight="24.0" fitWidth="24.0" layoutX="600.0" layoutY="588.0">
             <image>
-                <Image url="@image/add (1).png" />
+                <Image url="@/image/add (1).png" />
             </image>
         </ImageView>
         <Pane layoutX="36.0" layoutY="26.0" prefHeight="111.0" prefWidth="811.0" style="-fx-background-color: e7d39e;">
             <children>
-                <Label fx:id="workshopNameLabel" layoutX="10.0" layoutY="72.0" text="Workshop Name" textFill="#c99609">
+                <Label layoutX="10.0" layoutY="72.0" text="Workshop Name" textFill="#c99609">
                     <font>
                         <Font name="System Bold" size="19.0" />
                     </font>
@@ -116,7 +116,7 @@
                         <ColorAdjust brightness="-0.12" contrast="0.19" hue="-0.05" saturation="0.88" />
                     </effect>
                 </Label>
-                <Label fx:id="workshopidLabel" layoutX="18.0" layoutY="23.0" text="Workshop ID" textFill="#c99609">
+                <Label layoutX="18.0" layoutY="23.0" text="Workshop ID" textFill="#c99609">
                     <font>
                         <Font name="System Bold" size="19.0" />
                     </font>
@@ -148,7 +148,7 @@
                         <DropShadow color="#c99609" spread="0.34" />
                     </effect>
                 </CheckBox>
-                <Label fx:id="workshopNameLabel1" layoutX="439.0" layoutY="6.0" prefHeight="61.0" prefWidth="103.0" text="WorkshopPassword" textFill="#c99609" wrapText="true">
+                <Label layoutX="439.0" layoutY="6.0" prefHeight="61.0" prefWidth="103.0" text="WorkshopPassword" textFill="#c99609" wrapText="true">
                     <font>
                         <Font name="System Bold" size="19.0" />
                     </font>
@@ -168,7 +168,7 @@
         </Pane>
         <ImageView fitHeight="28.0" fitWidth="32.0" layoutX="149.0" layoutY="583.0">
             <image>
-                <Image url="@image/addworkshop.png" />
+                <Image url="@/image/addworkshop.png" />
             </image>
         </ImageView>
     </children>

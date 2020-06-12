@@ -8,13 +8,16 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -44,7 +47,7 @@ import javafx.stage.Stage;
  * @author A.Ibrahim
  */
 public class addUserController implements Initializable {
-
+    public String fileShaingName = "";
     Handler h = new ConsoleHandler();
 
 
@@ -74,6 +77,9 @@ public class addUserController implements Initializable {
 
     @FXML
     private MenuItem normalUser;
+    @FXML
+    private Button addButton;
+
 
     @FXML
     void setAdminAction(ActionEvent event) {
@@ -84,7 +90,26 @@ public class addUserController implements Initializable {
     void setUserAction(ActionEvent event) {
         permission.setText("Admin");
     }
+
     List list = new ArrayList();
+
+    @FXML
+    void addButtonAction(ActionEvent event) {
+        LinkedList<String> Names = new LinkedList<>();
+        addButton.getScene().getWindow().hide();
+        for (int i = 0; i < list.size(); i++) {
+            HBox bb = new HBox();
+            bb = (HBox) list.get(i);
+            Label label = new Label();
+            label = (Label) bb.getChildren().get(0);
+            Names.addLast(label.getText().toString());
+        }
+        try {
+            Client.server.shareFile(fileShaingName, Names);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
 
     @FXML
     void finishButtonAction(ActionEvent event) throws IOException {
@@ -102,10 +127,10 @@ public class addUserController implements Initializable {
                 HBox bb = new HBox();
                 bb = (HBox) list.get(i);
                 label = new Label();
-                label.setText((String) ((Label) bb.getChildren().get(0)).getText());
+                label.setText(((Label) bb.getChildren().get(0)).getText());
                 label.setPrefWidth(150);
                 label.setStyle("-fx-font:normal bold 14px 'System';");
-                label.setGraphic(new ImageView(new Image(new FileInputStream("../untitled2/src/image/user.png"))));
+                label.setGraphic(new ImageView(new Image(new FileInputStream("../Java RMI Client/src/image/user.png"))));
 
             } catch (FileNotFoundException ex) {
                 Logger.getLogger(mainScreanController.class.getName()).log(Level.SEVERE, null, ex);
@@ -120,7 +145,7 @@ public class addUserController implements Initializable {
 
             try {
 
-                info = new ImageView(new Image(new FileInputStream("../untitled2/src/image/information.png")));
+                info = new ImageView(new Image(new FileInputStream("../Java RMI Client/src/image/information.png")));
                 info.setOnMouseClicked(new EventHandler<javafx.scene.input.MouseEvent>() {
 
                     @Override
@@ -137,7 +162,6 @@ public class addUserController implements Initializable {
                         } catch (IOException ex) {
                             Logger.getLogger(mainScreanController.class.getName()).log(Level.SEVERE, null, ex);
                         }
-
                     }
                 });
 
@@ -149,7 +173,7 @@ public class addUserController implements Initializable {
             ImageView delete = null;
             try {
 
-                delete = new ImageView(new Image(new FileInputStream("../untitled2/src/image/delete.png")));
+                delete = new ImageView(new Image(new FileInputStream("../Java RMI Client/src/image/delete.png")));
             } catch (FileNotFoundException ex) {
                 Logger.getLogger(mainScreanController.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -172,20 +196,26 @@ public class addUserController implements Initializable {
         Stage stage = new Stage();
         stage.setScene(scene);
         stage.show();
-
     }
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        LinkedList<User> u = new LinkedList<>();
+        try {
+            u = (LinkedList<User>) Client.server.showAllUser();
 
-        for (int i = 0; i < 10; i++) {
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+
+        for (int i = 0; i < u.size(); i++) {
             CheckBox checkBox = new CheckBox();
 
             Label label = null;
             try {
-                label = new Label("  ssssss" + i);
+                label = new Label(u.get(i).getUniqueName());
                 label.setStyle("-fx-font:normal bold 14px 'System';");
-                label.setGraphic(new ImageView(new Image(new FileInputStream("../untitled2/src/image/user.png"))));
+                label.setGraphic(new ImageView(new Image(new FileInputStream("../Java RMI Client/src/image/user.png"))));
 
             } catch (FileNotFoundException ex) {
                 Logger.getLogger(mainScreanController.class.getName()).log(Level.SEVERE, null, ex);
@@ -200,7 +230,7 @@ public class addUserController implements Initializable {
 
             try {
 
-                info = new ImageView(new Image(new FileInputStream("../untitled2/src/image/information.png")));
+                info = new ImageView(new Image(new FileInputStream("../Java RMI Client/src/image/information.png")));
 
             } catch (FileNotFoundException ex) {
                 Logger.getLogger(mainScreanController.class.getName()).log(Level.SEVERE, null, ex);
@@ -214,7 +244,7 @@ public class addUserController implements Initializable {
 
                 @Override
                 public void handle(javafx.scene.input.MouseEvent event) {
-                    usernamefield.setText((String) ((Label) h.getChildren().get(0)).getText());
+                    usernamefield.setText(((Label) h.getChildren().get(0)).getText());
                     if (checkBox.isSelected()) {
                         list.add(h);
                     } else {

@@ -77,10 +77,7 @@ public class workshopController implements Initializable {
     private Label selectedfileLabel;
 
     @FXML
-    private Label workshopNameLabel;
-
-    @FXML
-    private Label workshopidLabel;
+    public Label workshopidLabel;
 
     @FXML
     private TextField textFailedWorkshopName;
@@ -91,6 +88,10 @@ public class workshopController implements Initializable {
     @FXML
     private CheckBox checkBoxPrivate;
 
+
+    @FXML
+    public Label workshopnameLabel;
+
     @FXML
     void addworkshopButtonAction(ActionEvent event) throws IOException {
         addworkshopButton.getScene().getWindow().hide();
@@ -100,15 +101,15 @@ public class workshopController implements Initializable {
     @FXML
     void addFileButtonAction(ActionEvent event) {
         FileChooser fileChooser = new FileChooser();
-        List isFile = new ArrayList<>();
-        isFile.add("*.doc");
-        isFile.add("*.docx");
-        isFile.add("*.Doc");
-        isFile.add("*.Docx");
-        isFile.add("*.pdf");
-        isFile.add("*.Xls");
-        isFile.add("*.cpp");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("files", isFile));
+  //      List isFile = new ArrayList<>();
+//        isFile.add("*.doc");
+//        isFile.add("*.docx");
+//        isFile.add("*.Doc");
+//        isFile.add("*.Docx");
+//        isFile.add("*.pdf");
+//        isFile.add("*.Xls");
+//        isFile.add("*.cpp");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("files", "*"));
 //        DirectoryChooser directoryChooser=new DirectoryChooser();
 //File selectfolder=directoryChooser.showDialog(null);
         List<File> f = fileChooser.showOpenMultipleDialog(null);
@@ -121,7 +122,7 @@ public class workshopController implements Initializable {
                 label = new Label("" + file.getName());
                 label.setPrefWidth(150);
                 label.setStyle("-fx-font:normal bold 14px 'System';");
-                label.setGraphic(new ImageView(new Image(new FileInputStream("../untitled2/src/image/approval.png"))));
+                label.setGraphic(new ImageView(new Image(new FileInputStream("../Java RMI Client/src/image/approval.png"))));
 
             } catch (FileNotFoundException ex) {
                 Logger.getLogger(mainScreanController.class.getName()).log(Level.SEVERE, null, ex);
@@ -136,7 +137,7 @@ public class workshopController implements Initializable {
 
             try {
 
-                info = new ImageView(new Image(new FileInputStream("../untitled2/src/image/information.png")));
+                info = new ImageView(new Image(new FileInputStream("../Java RMI Client/src/image/information.png")));
                 info.setOnMouseClicked(new EventHandler<javafx.scene.input.MouseEvent>() {
 
                     @Override
@@ -149,7 +150,9 @@ public class workshopController implements Initializable {
                             Scene scene = new Scene(s);
                             FileinfoController controller = loader.getController();
                             controller.fileName.setText(""+ file.getName());
+                            controller.fileName.setStyle("-fx-font:normal bold 12px 'System';");
                             controller.path.setText(""+file.getAbsoluteFile());
+                            controller.path.setStyle("-fx-font:normal bold 12px 'System';");
                             File f=new File(file.getAbsolutePath());
                             Double ss=f.length()/(1024*1024*1.0);
 
@@ -175,7 +178,7 @@ public class workshopController implements Initializable {
             ImageView delete = null;
             try {
 
-                delete = new ImageView(new Image(new FileInputStream("../untitled2/src/image/delete.png")));
+                delete = new ImageView(new Image(new FileInputStream("../Java RMI Client/src/image/delete.png")));
             } catch (FileNotFoundException ex) {
                 Logger.getLogger(mainScreanController.class.getName()).log(Level.SEVERE, null, ex);
             }
