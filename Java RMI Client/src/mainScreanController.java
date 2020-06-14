@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import encRSA.RSA;
+import encRSA.publicKey;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -32,14 +34,11 @@ import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -59,6 +58,29 @@ public class mainScreanController implements Initializable {
 
     @FXML
     private Tab filetab;
+    @FXML
+    private RadioButton AES256;
+
+    @FXML
+    private RadioButton UploadFilesRadiButton;
+
+    @FXML
+    private ToggleGroup type;
+
+    @FXML
+    private RadioButton shareRadioButton;
+
+    @FXML
+    private ToggleGroup Encription;
+
+    @FXML
+    private RadioButton RSAradioButton;
+
+    @FXML
+    private RadioButton AES128;
+
+    @FXML
+    private RadioButton AES192;
 
     @FXML
     private Label internalLabel;
@@ -141,10 +163,37 @@ public class mainScreanController implements Initializable {
     private Button logoutButton;
 
     @FXML
-    void DownloadButtonAction(ActionEvent event) throws RemoteException {
-        System.out.println("SSS");
-        Client.server.sendFileToClient("aa.mp3");
+    void UploadFilesRadiButtonAction(ActionEvent event) {
+
     }
+
+    @FXML
+    void shareRadioButtonAction(ActionEvent event) {
+
+    }
+
+
+    @FXML
+    void AES128Action(ActionEvent event) {
+
+    }
+
+    @FXML
+    void AES192Action(ActionEvent event) {
+
+    }
+
+    @FXML
+    void AES256Action(ActionEvent event) {
+
+    }
+
+
+    @FXML
+    void RSAActon(ActionEvent event) {
+
+    }
+
 
     @FXML
     /**!!!!! add multi file upload */
@@ -159,7 +208,18 @@ public class mainScreanController implements Initializable {
             System.out.println("we dont select any file");
             return;
         }
-        File f1 = new File(path);
+//        try {
+//            Client.rsa.encryptrsa(path,new publicKey(Client.e,Client.N));
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//          String encPath= RSA.getfilename(path)+"Enc";
+
+        Client.aes.encryption(Client.getPrivateKey(),path);
+
+        //upload file
+//        File f1 = new File(path);
+        File f1 = new File("tempenc");
         int fileSize = 0;
         int timer = 0;
         try {
@@ -197,7 +257,8 @@ public class mainScreanController implements Initializable {
         if (path.contains("."))
             extension = path.substring(path.lastIndexOf("."));
         Client.server.addFileInfo(f1.getName(), fileSize, extension);
-/**!!!!!!!!! add file to list */
+/** add file to list */
+        addFileUploadToList(f1.getName());
     }
 
 
@@ -430,6 +491,15 @@ public class mainScreanController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+
+        try {
+            Client.server.sendPublicKeyToServer(Client.rsa.getPublic_key().getE(), Client.rsa.getPublic_key().getN());
+//            System.out.println(";;;;;;;"+Client.rsa.getPublic_key().getE()+"----"+Client.rsa.getPublic_key().getN());
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+
+
 //        file tab controller
         /**   Error 1      */
         LinkedList<String> o = new LinkedList<>();
@@ -440,110 +510,7 @@ public class mainScreanController implements Initializable {
         }
 
         for (int i = 0; i < o.size(); i++) {
-            Label label = null;
-            try {
-                label = new Label(String.valueOf(o.get(i)));
-                label.setStyle("-fx-font:normal bold 14px 'System';");
-                label.setGraphic(new ImageView(new Image(new FileInputStream("../Java RMI Client/src/image/folder (4).png"))));
-
-            } catch (FileNotFoundException ex) {
-                Logger.getLogger(mainScreanController.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            HBox hBox = new HBox();
-            hBox.setPadding(new Insets(12, 10, 12, 10));
-            hBox.setSpacing(50);
-            list.setStyle("-fx-border-color: #c99704;-fx-border-width: 20;");
-            hBox.setCursor(Cursor.DEFAULT);
-
-            ImageView info = null;
-
-            try {
-
-                info = new ImageView(new Image(new FileInputStream("../Java RMI Client/src/image/information.png")));
-                //add action to info icon
-                info.setOnMouseClicked(new EventHandler<javafx.scene.input.MouseEvent>() {
-
-                    @Override
-                    public void handle(javafx.scene.input.MouseEvent event) {
-                        Parent root;
-                        try {
-                            root = FXMLLoader.load(getClass().getResource("fileinfo.fxml"));
-                            Stage stage = new Stage();
-                            Scene scene = new Scene(root);
-                            scene.getStylesheets().add(getClass().getResource("ListViewStyle.css").toExternalForm());
-                            stage.setScene(scene);
-                            stage.show();
-
-                        } catch (IOException ex) {
-                            Logger.getLogger(mainScreanController.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-
-                    }
-                });
-            } catch (FileNotFoundException ex) {
-                Logger.getLogger(mainScreanController.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            info.setCursor(Cursor.HAND);
-
-            ImageView share = null;
-            try {
-
-                share = new ImageView(new Image(new FileInputStream("../Java RMI Client/src/image/share.png")));
-            } catch (FileNotFoundException ex) {
-                Logger.getLogger(mainScreanController.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            share.setCursor(Cursor.HAND);
-            ImageView delete = null;
-            try {
-
-                delete = new ImageView(new Image(new FileInputStream("../Java RMI Client/src/image/delete.png")));
-
-            } catch (FileNotFoundException ex) {
-                Logger.getLogger(mainScreanController.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            delete.setCursor(Cursor.HAND);
-
-            hBox.getChildren().addAll(label, info, share, delete);
-            //add delete action in file tab
-            share.setOnMouseClicked(new EventHandler<javafx.scene.input.MouseEvent>() {
-
-                @Override
-                public void handle(javafx.scene.input.MouseEvent event) {
-                    Label ll = (Label) hBox.getChildren().get(0);
-                    String fileName = ll.getText();//print file share name
-
-                    System.out.println(fileName);
-                    FXMLLoader loader = new FXMLLoader();
-                    loader.setLocation(getClass().getResource("userFileSharing.fxml"));
-                    Parent s = null;
-                    try {
-                        s = loader.load();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    Scene scene = new Scene(s);
-                    addUserController controller = loader.getController();
-                    controller.fileShaingName = fileName;
-                    Stage stage = new Stage();
-                    stage.setScene(scene);
-                    stage.show();
-
-                }
-
-
-            });
-            //add share icone action
-            delete.setOnMouseClicked(new EventHandler<javafx.scene.input.MouseEvent>() {
-
-                @Override
-                public void handle(javafx.scene.input.MouseEvent event) {
-                    list.getItems().remove(hBox);
-                }
-            });
-
-            hBox.setAlignment(Pos.CENTER_LEFT);
-            list.getItems().add(hBox);
-
+            addFileUploadToList(String.valueOf(o.get(i)));
         }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // user tab controller
@@ -554,82 +521,91 @@ public class mainScreanController implements Initializable {
         } catch (RemoteException e) {
             e.printStackTrace();
         }
-        for (int i = 0; i < u.size(); i++) {
-            Label label = null;
+        for (int i = 0; i < u.size(); i++) addUserToList(u.get(i).getUniqueName());
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// workshop tab controller
+        for (int i = 0; i < 20; i++) addWorkshopToList("workshop" + i);
+//        chat controller/////////////////////////////////////////////////////////////////////////////////
+        for (int i = 0; i < 20; i++) addUserToChatList("User" + i);
+    }
 
-            try {
-                label = new Label(u.get(i).getUniqueName());
-                label.setPrefWidth(150);
-                label.setStyle("-fx-font:normal bold 14px 'System';");
-                label.setGraphic(new ImageView(new Image(new FileInputStream("../Java RMI Client/src/image/user.png"))));
 
-            } catch (FileNotFoundException ex) {
-                Logger.getLogger(mainScreanController.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            HBox h = new HBox();
-            h.setPadding(new Insets(12, 10, 12, 10));
-            h.setSpacing(60);
-            userlist.setStyle("-fx-font:normal bold 14px 'System';");
-            h.setCursor(Cursor.DEFAULT);
-            h.setPadding(new Insets(12, 10, 12, 10));
-            h.setSpacing(50);
-            ImageView info = null;
+    private void addUserToList(String user) {
+        Label label = null;
 
-            try {
+        try {
+            label = new Label(user);
+            label.setPrefWidth(150);
+            label.setStyle("-fx-font:normal bold 14px 'System';");
+            label.setGraphic(new ImageView(new Image(new FileInputStream("../Java RMI Client/src/image/user.png"))));
 
-                info = new ImageView(new Image(new FileInputStream("../Java RMI Client/src/image/information.png")));
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(mainScreanController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        HBox h = new HBox();
+        h.setPadding(new Insets(12, 10, 12, 10));
+        h.setSpacing(60);
+        userlist.setStyle("-fx-font:normal bold 14px 'System';");
+        h.setCursor(Cursor.DEFAULT);
+        h.setPadding(new Insets(12, 10, 12, 10));
+        h.setSpacing(50);
+        ImageView info = null;
 
-            } catch (FileNotFoundException ex) {
-                Logger.getLogger(mainScreanController.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            info.setCursor(Cursor.HAND);
-            ImageView delete = null;
+        try {
 
-            h.getChildren().addAll(label, info);
-            //click on cell list action in user tab
+            info = new ImageView(new Image(new FileInputStream("../Java RMI Client/src/image/information.png")));
+
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(mainScreanController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        info.setCursor(Cursor.HAND);
+        ImageView delete = null;
+
+        h.getChildren().addAll(label, info);
+        //click on cell list action in user tab
 //            User uu=null;
-            h.setOnMouseClicked(new EventHandler<javafx.scene.input.MouseEvent>() {
-                // ERROR 2 ADD another information to
+        h.setOnMouseClicked(new EventHandler<javafx.scene.input.MouseEvent>() {
+            // ERROR 2 ADD another information to
 
-                @Override
-                public void handle(javafx.scene.input.MouseEvent event) {
-                    Label ll = (Label) h.getChildren().get(0);
-                    String userName = ll.getText();
-                    uu = getUser(userName);
+            @Override
+            public void handle(javafx.scene.input.MouseEvent event) {
+                Label ll = (Label) h.getChildren().get(0);
+                String userName = ll.getText();
+                uu = getUser(userName);
 
-                    System.out.println(uu.getUniqueName());
-                    ////call search about username in bove and bush iuserinfo in user tab in info field
-                    usernameFiledLabel.setText(userName);
-                    emailFiledLable.setPadding(new Insets(3, 3, 3, 3));
-                    emailFiledLable.setText(uu.getEmail());//add email witch u search about
-                    phoneFiledLable.setPadding(new Insets(3, 3, 3, 3));
-                    phoneFiledLable.setText(uu.getPhone());//add phone witch u search about
-                    permissoinFiledLable.setPadding(new Insets(3, 3, 3, 3));
+                System.out.println(uu.getUniqueName());
+                ////call search about username in bove and bush iuserinfo in user tab in info field
+                usernameFiledLabel.setText(userName);
+                emailFiledLable.setPadding(new Insets(3, 3, 3, 3));
+                emailFiledLable.setText(uu.getEmail());//add email witch u search about
+                phoneFiledLable.setPadding(new Insets(3, 3, 3, 3));
+                phoneFiledLable.setText(uu.getPhone());//add phone witch u search about
+                permissoinFiledLable.setPadding(new Insets(3, 3, 3, 3));
 //                    permissoinFiledLable.setText("Admin");//add permission witch u search about
 
-                }
-            });
-            //click on info icon action in user tab
-            info.setOnMouseClicked(new EventHandler<javafx.scene.input.MouseEvent>() {
+            }
+        });
+        //click on info icon action in user tab
+        info.setOnMouseClicked(new EventHandler<javafx.scene.input.MouseEvent>() {
 
-                @Override
-                public void handle(javafx.scene.input.MouseEvent event) {
-                    Parent root;
-                    try {
-                        FXMLLoader loader = new FXMLLoader();
-                        loader.setLocation(getClass().getResource("Userinfo.fxml"));
-                        Parent s = loader.load();
-                        Scene scene = new Scene(s);
-                        userInfoController controller = loader.getController();
-                        controller.fullNameLabel.setText(uu.getFullName());
-                        controller.UniqueNameLabel.setText(uu.getUniqueName());
-                        controller.BirthdayLabel.setText(uu.getBirthday().toString());
-                        System.out.println();
-                        controller.PhoneLabel.setText(uu.getPhone());
-                        controller.EmailLabel.setText(uu.getEmail());
-                        Stage stage = new Stage();
-                        stage.setScene(scene);
-                        stage.show();
+            @Override
+            public void handle(javafx.scene.input.MouseEvent event) {
+                Parent root;
+                try {
+                    FXMLLoader loader = new FXMLLoader();
+                    loader.setLocation(getClass().getResource("Userinfo.fxml"));
+                    Parent s = loader.load();
+                    Scene scene = new Scene(s);
+                    userInfoController controller = loader.getController();
+                    controller.fullNameLabel.setText(uu.getFullName());
+                    controller.UniqueNameLabel.setText(uu.getUniqueName());
+                    controller.BirthdayLabel.setText(uu.getBirthday().toString());
+                    System.out.println();
+                    controller.PhoneLabel.setText(uu.getPhone());
+                    controller.EmailLabel.setText(uu.getEmail());
+                    Stage stage = new Stage();
+                    stage.setScene(scene);
+                    stage.show();
 //
 //                        root = FXMLLoader.load(getClass().getResource("Userinfo.fxml"));
 //                        Stage stage = new Stage();
@@ -638,12 +614,12 @@ public class mainScreanController implements Initializable {
 //                        stage.setScene(scene);
 //                        stage.show();
 
-                    } catch (IOException ex) {
-                        Logger.getLogger(mainScreanController.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-
+                } catch (IOException ex) {
+                    Logger.getLogger(mainScreanController.class.getName()).log(Level.SEVERE, null, ex);
                 }
-            });
+
+            }
+        });
 
 //            //add delete action in user tab
 //            delete.setOnMouseClicked(new EventHandler<javafx.scene.input.MouseEvent>() {
@@ -653,43 +629,199 @@ public class mainScreanController implements Initializable {
 //                    userlist.getItems().remove(h);
 //                }
 //            });
-            h.setAlignment(Pos.CENTER_LEFT);
-            userlist.getItems().add(h);
+        h.setAlignment(Pos.CENTER_LEFT);
+        userlist.getItems().add(h);
+    }
+
+    private void addWorkshopToList(String workshopName) {
+        Label label = null;
+        try {
+            label = new Label(workshopName);
+            label.setStyle("-fx-font:normal bold 14px 'System';");
+            label.setGraphic(new ImageView(new Image(new FileInputStream("../Java RMI Client/src/image/people (1).png"))));
+
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(mainScreanController.class.getName()).log(Level.SEVERE, null, ex);
         }
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// workshop tab controller
-        for (int i = 0; i < 20; i++) {
-            Label label = null;
-            try {
-                label = new Label("  workshop " + i);
-                label.setStyle("-fx-font:normal bold 14px 'System';");
-                label.setGraphic(new ImageView(new Image(new FileInputStream("../Java RMI Client/src/image/people (1).png"))));
+        HBox hh = new HBox();
+        hh.setPadding(new Insets(12, 10, 12, 10));
+        hh.setSpacing(40);
+        workshoplist.setStyle("-fx-font:normal bold 13px 'System';");
+        hh.setCursor(Cursor.DEFAULT);
 
-            } catch (FileNotFoundException ex) {
-                Logger.getLogger(mainScreanController.class.getName()).log(Level.SEVERE, null, ex);
+        ImageView info = null;
+
+        try {
+
+            info = new ImageView(new Image(new FileInputStream("../Java RMI Client/src/image/information.png")));
+
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(mainScreanController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        info.setOnMouseClicked(new EventHandler<javafx.scene.input.MouseEvent>() {
+
+            @Override
+            public void handle(javafx.scene.input.MouseEvent event) {
+                Parent root;
+                try {
+                    root = FXMLLoader.load(getClass().getResource("workShopInfo.fxml"));
+                    Stage stage = new Stage();
+                    Scene scene = new Scene(root);
+                    scene.getStylesheets().add(getClass().getResource("ListViewStyle.css").toExternalForm());
+                    stage.setScene(scene);
+                    stage.show();
+
+                } catch (IOException ex) {
+                    Logger.getLogger(mainScreanController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+
             }
-            HBox hh = new HBox();
-            hh.setPadding(new Insets(12, 10, 12, 10));
-            hh.setSpacing(40);
-            workshoplist.setStyle("-fx-font:normal bold 13px 'System';");
-            hh.setCursor(Cursor.DEFAULT);
+        });
+        info.setCursor(Cursor.HAND);
 
-            ImageView info = null;
+        ImageView adduser = null;
 
-            try {
+        try {
 
-                info = new ImageView(new Image(new FileInputStream("../Java RMI Client/src/image/information.png")));
+            adduser = new ImageView(new Image(new FileInputStream("../Java RMI Client/src/image/adduser.png")));
 
-            } catch (FileNotFoundException ex) {
-                Logger.getLogger(mainScreanController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(mainScreanController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        adduser.setCursor(Cursor.HAND);
+        adduser.setOnMouseClicked(new EventHandler<javafx.scene.input.MouseEvent>() {
+
+            @Override
+            public void handle(javafx.scene.input.MouseEvent event) {
+                Parent root;
+                try {
+                    root = FXMLLoader.load(getClass().getResource("userFileSharing.fxml"));
+                    Stage stage = new Stage();
+                    Scene scene = new Scene(root);
+                    scene.getStylesheets().add(getClass().getResource("ListViewStyle.css").toExternalForm());
+                    stage.setScene(scene);
+                    stage.show();
+
+                } catch (IOException ex) {
+                    Logger.getLogger(mainScreanController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+
             }
+        });
+
+        ImageView delete = null;
+        try {
+
+            delete = new ImageView(new Image(new FileInputStream("../Java RMI Client/src/image/delete.png")));
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(mainScreanController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        delete.setCursor(Cursor.HAND);
+
+        hh.getChildren().addAll(label, info, adduser, delete);
+        //add delete action in workshop tab
+        delete.setOnMouseClicked(new EventHandler<javafx.scene.input.MouseEvent>() {
+
+            @Override
+            public void handle(javafx.scene.input.MouseEvent event) {
+                workshoplist.getItems().remove(hh);
+            }
+        });
+        hh.setAlignment(Pos.CENTER_LEFT);
+        workshoplist.getItems().add(hh);
+        hh.setOnMouseClicked(new EventHandler<javafx.scene.input.MouseEvent>() {
+            @Override
+            public void handle(javafx.scene.input.MouseEvent event) {
+                if (event.getClickCount() == 2 && !event.isConsumed()) {
+                    event.consume();
+                    FXMLLoader loader = new FXMLLoader();
+                    loader.setLocation(getClass().getResource("workshopInterface.fxml"));
+                    Parent s = null;
+                    try {
+                        s = loader.load();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    Scene scene = new Scene(s);
+                    workshopController controller = loader.getController();
+                    System.out.println(controller);
+                    System.out.println(controller.workshopidLabel.getText());
+                    controller.workshopidLabel.setText("#222");
+                    Label ll = (Label) hh.getChildren().get(0);
+                    String workshopName = ll.getText();
+                    controller.workshopnameLabel.setText(workshopName);
+                    Stage stage = new Stage();
+                    stage.setScene(scene);
+                    stage.show();
+                }
+            }
+
+
+        });
+    }
+
+    private void addUserToChatList(String user) {
+        Label label = null;
+        HBox h = new HBox();
+        h.setId("USer");
+        label = new Label(user);
+        label.setStyle("-fx-font:normal bold 14px 'System';");
+
+        try {
+            label.setGraphic(new ImageView(new Image(new FileInputStream("../Java RMI Client/src/image/default1.png"))));
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(mainScreanController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        h.setPadding(new Insets(12, 10, 12, 10));
+        h.setSpacing(60);
+        userList.setStyle("-fx-font:normal bold 13px 'System';");
+        h.setCursor(Cursor.DEFAULT);
+        Label online = new Label("");
+        try {
+            online.setGraphic(new ImageView(new Image(new FileInputStream("../Java RMI Client/src/image/online.png"))));
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(mainScreanController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        h.getChildren().addAll(online, label);
+        h.setAlignment(Pos.CENTER_LEFT);
+        userList.getItems().add(h);
+
+    }
+
+    private void addFileUploadToList(String filename) {
+
+        Label label = null;
+        try {
+            label = new Label(filename);
+            label.setStyle("-fx-font:normal bold 14px 'System';");
+            label.setPrefWidth(150);
+            label.setGraphic(new ImageView(new Image(new FileInputStream("../Java RMI Client/src/image/folder (4).png"))));
+
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(mainScreanController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        HBox hBox = new HBox();
+        hBox.setPadding(new Insets(12, 10, 12, 10));
+        hBox.setSpacing(30);
+        list.setStyle("-fx-border-color: #c99704;-fx-border-width: 20;");
+        hBox.setCursor(Cursor.DEFAULT);
+
+
+        ImageView info = null;
+
+        try {
+
+            info = new ImageView(new Image(new FileInputStream("../Java RMI Client/src/image/information.png")));
+            //add action to info icon
             info.setOnMouseClicked(new EventHandler<javafx.scene.input.MouseEvent>() {
 
                 @Override
                 public void handle(javafx.scene.input.MouseEvent event) {
                     Parent root;
                     try {
-                        root = FXMLLoader.load(getClass().getResource("workShopInfo.fxml"));
+                        root = FXMLLoader.load(getClass().getResource("fileinfo.fxml"));
                         Stage stage = new Stage();
                         Scene scene = new Scene(root);
                         scene.getStylesheets().add(getClass().getResource("ListViewStyle.css").toExternalForm());
@@ -702,120 +834,92 @@ public class mainScreanController implements Initializable {
 
                 }
             });
-            info.setCursor(Cursor.HAND);
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(mainScreanController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        info.setCursor(Cursor.HAND);
 
-            ImageView adduser = null;
+        ImageView share = null;
+        try {
 
-            try {
+            share = new ImageView(new Image(new FileInputStream("../Java RMI Client/src/image/share.png")));
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(mainScreanController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        share.setCursor(Cursor.HAND);
+        ImageView delete = null;
+        try {
 
-                adduser = new ImageView(new Image(new FileInputStream("../Java RMI Client/src/image/adduser.png")));
+            delete = new ImageView(new Image(new FileInputStream("../Java RMI Client/src/image/delete.png")));
 
-            } catch (FileNotFoundException ex) {
-                Logger.getLogger(mainScreanController.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            adduser.setCursor(Cursor.HAND);
-            adduser.setOnMouseClicked(new EventHandler<javafx.scene.input.MouseEvent>() {
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(mainScreanController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        delete.setCursor(Cursor.HAND);
+        ImageView download = null;
 
+        try {
+
+            download = new ImageView(new Image(new FileInputStream("../Java RMI Client/src/image/download.png")));
+
+            download.setOnMouseClicked(new EventHandler<javafx.scene.input.MouseEvent>() {
                 @Override
                 public void handle(javafx.scene.input.MouseEvent event) {
-                    Parent root;
+                    Label ll = (Label) hBox.getChildren().get(0);
+                    String fileName = ll.getText();//print file share name
+//                        System.out.println("++++"+fileName);
                     try {
-                        root = FXMLLoader.load(getClass().getResource("userFileSharing.fxml"));
-                        Stage stage = new Stage();
-                        Scene scene = new Scene(root);
-                        scene.getStylesheets().add(getClass().getResource("ListViewStyle.css").toExternalForm());
-                        stage.setScene(scene);
-                        stage.show();
-
-                    } catch (IOException ex) {
-                        Logger.getLogger(mainScreanController.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-
-                }
-            });
-
-            ImageView delete = null;
-            try {
-
-                delete = new ImageView(new Image(new FileInputStream("../Java RMI Client/src/image/delete.png")));
-            } catch (FileNotFoundException ex) {
-                Logger.getLogger(mainScreanController.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            delete.setCursor(Cursor.HAND);
-
-            hh.getChildren().addAll(label, info, adduser, delete);
-            //add delete action in workshop tab
-            delete.setOnMouseClicked(new EventHandler<javafx.scene.input.MouseEvent>() {
-
-                @Override
-                public void handle(javafx.scene.input.MouseEvent event) {
-                    workshoplist.getItems().remove(hh);
-                }
-            });
-            hh.setAlignment(Pos.CENTER_LEFT);
-            workshoplist.getItems().add(hh);
-            hh.setOnMouseClicked(new EventHandler<javafx.scene.input.MouseEvent>() {
-                @Override
-                public void handle(javafx.scene.input.MouseEvent event) {
-                    if (event.getClickCount() == 2 && !event.isConsumed()) {
-                        event.consume();
-                        FXMLLoader loader = new FXMLLoader();
-                        loader.setLocation(getClass().getResource("workshopInterface.fxml"));
-                        Parent s = null;
-                        try {
-                            s = loader.load();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        Scene scene = new Scene(s);
-                        workshopController controller = loader.getController();
-                        System.out.println(controller);
-                        System.out.println(controller.workshopidLabel.getText());
-                        controller.workshopidLabel.setText("#222");
-                        Label ll = (Label) hh.getChildren().get(0);
-                        String workshopName = ll.getText();
-                        controller.workshopnameLabel.setText(workshopName);
-                        Stage stage = new Stage();
-                        stage.setScene(scene);
-                        stage.show();
+                        Client.server.sendFileToClient(fileName);
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
                     }
                 }
-
-
             });
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(mainScreanController.class.getName()).log(Level.SEVERE, null, ex);
         }
-//        chat controller/////////////////////////////////////////////////////////////////////////////////
-        for (int i = 0; i < 20; i++) {
-            Label label = null;
-            HBox h = new HBox();
-            h.setId("USer");
-            label = new Label("user " + i);
-            label.setStyle("-fx-font:normal bold 14px 'System';");
 
-            try {
-                label.setGraphic(new ImageView(new Image(new FileInputStream("../Java RMI Client/src/image/default1.png"))));
-            } catch (FileNotFoundException ex) {
-                Logger.getLogger(mainScreanController.class.getName()).log(Level.SEVERE, null, ex);
+        download.setCursor(Cursor.HAND);
+        hBox.getChildren().addAll(label, info, share, delete, download);
+        //add delete action in file tab
+        share.setOnMouseClicked(new EventHandler<javafx.scene.input.MouseEvent>() {
+
+            @Override
+            public void handle(javafx.scene.input.MouseEvent event) {
+                Label ll = (Label) hBox.getChildren().get(0);
+                String fileName = ll.getText();//print file share name
+
+                System.out.println(fileName);
+                FXMLLoader loader = new FXMLLoader();
+                loader.setLocation(getClass().getResource("userFileSharing.fxml"));
+                Parent s = null;
+                try {
+                    s = loader.load();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                Scene scene = new Scene(s);
+                addUserController controller = loader.getController();
+                controller.fileShaingName = fileName;
+                Stage stage = new Stage();
+                stage.setScene(scene);
+                stage.show();
+
             }
 
-            h.setPadding(new Insets(12, 10, 12, 10));
-            h.setSpacing(20);
-            userList.setStyle("-fx-font:normal bold 13px 'System';");
-            ;
-            h.setCursor(Cursor.DEFAULT);
 
-            Label online = new Label("");
-            try {
-                online.setGraphic(new ImageView(new Image(new FileInputStream("../Java RMI Client/src/image/online.png"))));
-            } catch (FileNotFoundException ex) {
-                Logger.getLogger(mainScreanController.class.getName()).log(Level.SEVERE, null, ex);
+        });
+        //add share icone action
+        delete.setOnMouseClicked(new EventHandler<javafx.scene.input.MouseEvent>() {
+
+            @Override
+            public void handle(javafx.scene.input.MouseEvent event) {
+                list.getItems().remove(hBox);
             }
+        });
+        hBox.setAlignment(Pos.CENTER_LEFT);
+        list.getItems().add(hBox);
 
-            h.getChildren().addAll(online, label);
-            h.setAlignment(Pos.CENTER_LEFT);
-            userList.getItems().add(h);
-
-        }
     }
 
 }

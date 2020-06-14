@@ -1,10 +1,14 @@
+import AES.AES;
+
 import java.awt.*;
 import java.io.*;
+import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Scanner;
 
 /**
@@ -20,6 +24,21 @@ public class Client extends UnicastRemoteObject implements DriveInterface, Runna
     private String ClientName;
     boolean chkExit = true;
     boolean chkLog = false;
+    /**
+     * server public key variable
+     */
+    static BigInteger e;
+    static BigInteger N;
+
+    static encRSA.RSA rsa = new encRSA.RSA();
+    static AES aes = new AES();
+    private static String privateKey = "";
+
+    public static String getPrivateKey() {
+        return privateKey;
+    }
+
+
 
     protected Client(DriveInterface chatinterface) throws RemoteException {
 
@@ -42,7 +61,6 @@ public class Client extends UnicastRemoteObject implements DriveInterface, Runna
 //        System.out.println (String.valueOf(ss.get(0)));
         //        System.out.println(server.downloadFile());
     }
-
 
 
     public void sendFileToServer(String message) throws RemoteException {
@@ -95,7 +113,6 @@ public class Client extends UnicastRemoteObject implements DriveInterface, Runna
         server.addFileInfo(f1.getName(), fileSize, extension);
 
     }
-
 
 
     @Override
@@ -175,19 +192,54 @@ public class Client extends UnicastRemoteObject implements DriveInterface, Runna
         return new String[0];
     }
 
+    @Override
+    public void sendPublicKeyToClint(BigInteger e, BigInteger N) throws RemoteException {
+        this.e = e;
+        this.N = N;
+//        System.out.println(e+"----"+N);
+    }
+
+    @Override
+    public void sendPublicKeyToServer(BigInteger e, BigInteger N) throws RemoteException {
+
+    }
+
+    @Override
+    public void sendPrivateKeyToClint(int type, byte[] bytes) throws RemoteException {
+        File file = new File("aesKeyEnc");
+        try {
+            FileOutputStream fileOutputStream = new FileOutputStream(file);
+            fileOutputStream.write(bytes);
+            fileOutputStream.close();
+            rsa.deccryptrsa("aesKeyEnc", "privateKey", ".txt");
+            BufferedReader bufferedReader = new BufferedReader(new FileReader("privateKey.txt"));
+            privateKey = bufferedReader.readLine();
+            bufferedReader.close();
+            Files.delete(Paths.get("aesKeyEnc"));
+            Files.delete(Paths.get("privateKey.txt"));
+            System.out.println(privateKey);
+        } catch (FileNotFoundException ex) {
+            ex.printStackTrace();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+
+        } catch (ClassNotFoundException ex) {
+            ex.printStackTrace();
+        }
+    }
+
     public void broadcastMessage(String clientname, String message) throws RemoteException {
     }
 
     @Override
     public void sendMessageToClient(int id, String message) throws RemoteException {
-        switch (id)
-        {
+        switch (id) {
             //test Connection
-            case 0:{
+            case 0: {
                 System.out.println(message);
             }
             //Send new File to User
-            case 1:{
+            case 1: {
                 System.out.println(message);
             }
         }
@@ -208,17 +260,18 @@ public class Client extends UnicastRemoteObject implements DriveInterface, Runna
 
         switch (1) {
             //Login
-                      case 1: {
+            case 1: {
                 System.out.print("Enter The Name : ");
                 clientName = scanner.nextLine();
 //                System.out.print("Enter The Password : ");
 //                clientPassword = scanner.nextLine();
 
                 try {
-                    System.out.println(server.checkClientCredintials(server, clientName, clientPassword)); ;
-                    LinkedList<String > ss=new LinkedList<String >();
+                    System.out.println(server.checkClientCredintials(server, clientName, clientPassword));
+                    ;
+                    LinkedList<String> ss = new LinkedList<String>();
                     ss.add("s");
-                    server.shareFile("Compiler.zip",ss);
+                    server.shareFile("Compiler.zip", ss);
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 }

@@ -1,6 +1,13 @@
 import com.sun.scenario.animation.shared.ClipInterpolator;
+import com.sun.xml.internal.fastinfoset.tools.FI_DOM_Or_XML_DOM_SAX_SAXEvent;
+import encRSA.RSA;
+import encRSA.publicKey;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import java.io.*;
+import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.rmi.RemoteException;
@@ -18,6 +25,37 @@ import java.util.List;
  */
 
 public class Server extends UnicastRemoteObject implements DriveInterface {
+    /**
+     * user files name
+     */
+    //this file for save a temp object when we receive a notification and the user is offline
+    public final String tempFile = "temp.json";
+    // //this directory save the uploaded file in the server
+    public final String userFilesDirectory = "files";
+    // //this directory save the file  info in the server
+    public final String filesInfoDirectory = "fileInfo";
+    //this file saves files path that have been shared with me
+    public final String fileShareWithMe = "fileShareWithMe.json";
+    //
+    public final String jsonExtension = ".json";
+
+    /**
+     * user files path
+     */
+    public String tempPath;
+    public String userFilesDirectoryPath;
+    public String filesInfoDirectoryPath;
+    public String fileShareWithMePath;
+
+
+    /**
+     * clint public key variable
+     */
+    BigInteger e;
+    BigInteger N;
+
+
+
 
     //    private static final long serialVersionUID = 1L;
     static private ArrayList<DriveInterface> clientList;
@@ -26,11 +64,27 @@ public class Server extends UnicastRemoteObject implements DriveInterface {
     private String name;
     DriveInterface userInterface;
 
+    /**
+     * default constrictor
+     *
+     * @throws RemoteException
+     */
     protected Server() throws RemoteException {
         clientList = new ArrayList<DriveInterface>();
 
     }
 
+    /**
+     * check Client Credentials method
+     *
+     * @param chatinterface
+     * @param clientname
+     * @param password
+     * @return true | false
+     * @throws RemoteException this function responsible for check User name and password
+     *                         1-if the user name and password are correct define the interface , save client data and return true.
+     *                         2-return false otherwise
+     */
     public synchronized boolean checkClientCredintials(DriveInterface chatinterface, String clientname, String password) throws RemoteException {
         System.out.println(chatinterface);
         if (StartServer.CheckUserPassword(clientname, password)) {
@@ -38,16 +92,14 @@ public class Server extends UnicastRemoteObject implements DriveInterface {
             userInterface = chatinterface;
             name = clientname;
             userClient.put(name, chatinterface);
-
+            //send massage to test the connection =>for programmer delete in product version
             chatinterface.sendMessageToClient(0, "Test Connection ");
-////            sssss.sendFileToClient("");
-//            //!!!! un comment next line after create register
-//            user = StartServer.userProfile.get(clientname);
-//            System.out.println(user);
-            System.out.println("55555555555555");
-            return true;
+            defineUserPath(StartServer.userProfile.get(clientname));
+            chatinterface.sendPublicKeyToClint(StartServer.rsa.getPublic_key().getE(),StartServer.rsa.getPublic_key().getN());
+            System.out.println(StartServer.rsa.getPublic_key().getE()+"----"+StartServer.rsa.getPublic_key().getN());
+            return true;//if you login done
         }
-        return false;
+        return false;//if happen any problem
     }
 
     public synchronized void broadcastMessage(String clientname, String message) throws RemoteException {
@@ -68,38 +120,64 @@ public class Server extends UnicastRemoteObject implements DriveInterface {
         for (int i = 0; i < names.size(); i++) {
             System.out.println(i + ":" + names.get(i));
 
-
+            String temp = names.get(i).toString();
             //1-for any user we add File_path to his/her fileShareMe
-//            try {
-            String path = "..\\Java RMI Server\\userFile\\" + names.get(i) + "\\fileShareMe";
-            LinkedList<shareFile> listFileInfo = new LinkedList<>();
-//                FileInputStream fileInputStream = new FileInputStream(path);
-//                ObjectInputStream ois = new ObjectInputStream(fileInputStream);
-//                listFileInfo = (LinkedList<shareFile>) ois.readObject();
-//                ois.close();
-//                fileInputStream.close();
-//                listFileInfo.add(new shareFile(fileName, name, user.getPath() + "\\" + fileName));
-////                Files.deleteIfExists(Paths.get(path));
-//                File file=new File(path);
-//                file.delete();
-//                FileOutputStream fileOutputStream = new FileOutputStream(path);
-//                ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
-//                objectOutputStream.writeObject(listFileInfo);
-//                objectOutputStream.close();
-//                fileOutputStream.close();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            } catch (ClassNotFoundException e) {
-//                e.printStackTrace();
-//            }
+
+            JSONParser parser = new JSONParser();
+            JSONObject jsonobject;
+            Object obj = null;
+            Object obj1 = null;
+            String path = "..\\Java RMI Server\\userFile\\" + temp + "\\" + fileShareWithMe;
+
+            try {
+                obj = parser.parse(new FileReader(path));
+                obj1 = parser.parse(new FileReader(filesInfoDirectoryPath + "\\" + fileName + jsonExtension));
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            jsonobject = (JSONObject) obj;
+            JSONObject jsontemp = (JSONObject) obj1;
+
+
+            System.out.println("11111");
+            JSONObject jo = new JSONObject();
+            jo.put("fileName", fileName);
+            jo.put("from", name);
+            jo.put("type", (String) jsontemp.get("type"));
+            System.out.println(jsontemp.get("len"));
+            jo.put("len", jsontemp.get("len"));
+            jo.put("path", filesInfoDirectoryPath + "\\" + fileName);
+            ;
+            String n = ((String) jsonobject.get("n"));
+            int x = Integer.parseInt(n);
+            x++;
+            n = String.valueOf(x);
+            jsonobject.replace("n", n);
+            jsonobject.put("file" + x, jo.toJSONString());
+            System.out.println("222222");
+            try (FileWriter file = new FileWriter(path)) {
+                file.write(jsonobject.toString());
+                file.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
             System.out.println("done:for any user we add File_path to his/her fileShareMe ");
 //           //2- send notification if the user is online
+
             userClient.entrySet().forEach(entry -> {
                 try {
-                    System.out.println("/*/*/*/*/*/*/*/*/*" + entry.getKey().toString());
-//                    if (entry.getKey().);
-                    entry.getValue().sendMessageToClient(1, "your received file" + "from : " + name + " => File Name is : " + fileName);
-//                    else{ //!!!!!  save notification in temp file
+
+                    if (entry.getKey().toString() == temp)
+                        entry.getValue().sendMessageToClient(1, "your received file" + "from : " + name + " => File Name is : " + fileName);
+                    else { //!!!!!  save notification in temp file
+                        System.out.println("user :" + entry.getKey().toString() + " is offline and received file " + fileName);
+                    }
 //                }
                 } catch (RemoteException e) {
                     e.printStackTrace();
@@ -134,47 +212,38 @@ public class Server extends UnicastRemoteObject implements DriveInterface {
         boolean b = f.mkdir();
         if (b) {
             user.setPath(path1);
-            this.user = user;
+
         } else {
             //!!!!! Create random path
 //            user.setPath(path1);
 //            this.user = user;
         }
-        //this file for save a temp object when we receive a notification and the user is offline
-        File file = new File(this.user.getPath() + "\\" + "temp.txt");
-        //this file save the uploaded file in the server
-//        String path = "C:\\Users\\Eng Alaa Alkheder\\Desktop\\"+ "UserFiles";
-//        File Userfiles = new File(path);
-        File Userfiles = new File(this.user.getPath() + "\\" + "UserFiles");
-        //
-        File fileShare = new File(this.user.getPath() + "\\" + "fileShare");
-        //
-        File fileShareMe = new File(this.user.getPath() + "\\" + "fileShareMe");
-        fileShare.mkdir();
 
+        defineUserPath(user);
+        //this file for save a temp object when we receive a notification and the user is offline
+        File tempfile = new File(tempPath);
+        //this directory save the uploaded file in the server
+        File Userfiles = new File(userFilesDirectoryPath);
+        //
+        File fileInfo = new File(filesInfoDirectoryPath);
+//        //create new Files
         try {
-            fileShareMe.createNewFile();
-            file.createNewFile();
-            System.out.println("register user   create file is :" + Userfiles.createNewFile());
-            ;
+            tempfile.createNewFile();
+            Userfiles.mkdir();
+            fileInfo.mkdir();
+            //
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("n", "0");
+            FileWriter file = new FileWriter(fileShareWithMePath);
+            file.write(jsonObject.toString());
+            file.flush();
+
         } catch (IOException e) {
             e.printStackTrace();
         }
-        try {
-            FileOutputStream fileOutputStream = new FileOutputStream(this.user.getPath() + "\\" + "UserFiles");
-            ObjectOutputStream oob = new ObjectOutputStream(fileOutputStream);
-            oob.writeObject(new ArrayList<fileInfo>());
-            oob.close();
-            fileOutputStream.close();
-            FileOutputStream outputStream = new FileOutputStream(this.user.getPath() + "\\" + "fileShareMe");
-            ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
-            objectOutputStream.writeObject(new LinkedList<shareFile>());
-            objectOutputStream.close();
-            outputStream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        //Save user object
+
+
+        //Save user object in the
         StartServer.userProfile.put(user.getUniqueName(), user);
         StartServer.user.put(user.getUniqueName(), user.getPassword());
         StartServer.saveUserPassword();
@@ -182,13 +251,9 @@ public class Server extends UnicastRemoteObject implements DriveInterface {
         return true;
     }
 
-    /**
-     *
-     */
-    public void sendFileToClient(String FileName) throws RemoteException {
-//        String path = "qwqw.pdf";//path for user + file name
 
-        String path = "..\\Java RMI Server\\userFile\\" + name + "\\" + FileName;
+    public void sendFileToClient(String FileName) throws RemoteException {
+        String path = userFilesDirectoryPath + "\\" + FileName;
         File f1 = new File(path);
         int fileSize = 0;
         int timer = 0;
@@ -251,7 +316,20 @@ public class Server extends UnicastRemoteObject implements DriveInterface {
 
     @Override
     public String downloadFileInfo() throws RemoteException {
+/*
+  JSONParser parser = new JSONParser();
+    JSONObject jsonobject;
+    Object obj;
+    File select;
 
+  obj = parser.parse(new FileReader(select));
+            jsonobject = (JSONObject) obj;
+//            ArrayList<Character> alphabet = (ArrayList<Character>) jsonobject.get("alphabet");
+            alphabet = (String) jsonobject.get("alphabet");
+            alphabet = alphabet.toLowerCase();
+
+
+ */
         return "sssssss";
     }
 
@@ -260,105 +338,74 @@ public class Server extends UnicastRemoteObject implements DriveInterface {
     @Override
     public void UpLoadFile(String filename, byte[] data, int len) throws RemoteException {
         try {
-//            System.out.println(this.user.getPath());
-            String path = "..\\Java RMI Server\\userFile\\" + name + "\\" + filename;
-            File f = new File(path);
+            //!!!!check if the file uploaded use searchFile();
+
+            File f = new File(userFilesDirectoryPath + "\\" + filename);
             f.createNewFile();
             FileOutputStream out = new FileOutputStream(f, true);
             out.write(data, 0, len);
             out.flush();
             out.close();
             //timer for download
-            System.out.println("Done writing data..." + i++);
+//            System.out.println("Done writing data..." + i++);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        System.out.println("Done upload file name is :  " + filename);
     }
 
     @Override
     public void addFileInfo(String filename, int len, String type) throws RemoteException {
-//        String path = "C:\\Users\\Eng Alaa Alkheder\\Desktop\\"+ "UserFiles";
-        String path = "..\\Java RMI Server\\userFile\\" + name + "\\UserFiles";
-
-        List<fileInfo> listFileInfo = new ArrayList<fileInfo>();
-        try {
-            FileInputStream fileInputStream = new FileInputStream(path);
-            ObjectInputStream ois = new ObjectInputStream(fileInputStream);
-            listFileInfo = (ArrayList<fileInfo>) ois.readObject();
-            ois.close();
-            fileInputStream.close();
+        //!!!!check if the file uploaded use searchFile();
+        System.out.println(" ADD FILE INFO method  --- file info" + filename);
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("filename", filename);
+        jsonObject.put("len", len);
+        jsonObject.put("type", type);
+        try (FileWriter file = new FileWriter(filesInfoDirectoryPath + "\\" + filename + jsonExtension)) {
+            file.write(jsonObject.toString());
+            file.flush();
         } catch (IOException e) {
             e.printStackTrace();
-        } catch (ClassNotFoundException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.println("FILE INFO " + filename);
-        System.out.println("@@@" + listFileInfo.size());
-        for (int j = 0; j < listFileInfo.size(); j++) {
-            System.out.println(j + " : " + listFileInfo.get(i).getName());
-        }
-        fileInfo fileInfo = new fileInfo(filename, len, type);
-        listFileInfo.add(fileInfo);
-        System.out.println("********1");
-//        for (int j = 0; j < listFileInfo.size(); j++) {
-//            System.out.println(j + " : " + listFileInfo.get(i).getName());
+//        System.out.println(filename);
+//        try {
+//            StartServer.rsa.deccryptrsa(userFilesDirectoryPath+"\\"+filename,filename.substring(0,filename.length()-3),type);
+//        } catch (IOException ex) {
+//            ex.printStackTrace();
+//        } catch (ClassNotFoundException ex) {
+//            ex.printStackTrace();
 //        }
+StartServer.aes.decryption(StartServer.privateKey,userFilesDirectoryPath+"\\"+"tempenc","alaa",type);
 
-        try {
-//            File f=new File(path);
-//            f.delete();
-//            Files.deleteIfExists(Paths.get(path));
-            File file = new File(path);
-            System.out.println(file.delete());
-            file.createNewFile();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        System.out.println("********12");
-        try {
-            FileOutputStream fileOutputStream = new FileOutputStream(path);
-            ObjectOutputStream oob = new ObjectOutputStream(fileOutputStream);
-            oob.writeObject(listFileInfo);
-            oob.close();
-            fileOutputStream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        System.out.println("********13");
+
+
     }
 
     @Override
     public void downloadFile(String filename, byte[] data, int len) throws RemoteException {
     }
 
+    /**
+     * show All File method
+     *
+     * @return Linked list from String Type have files name
+     * @throws RemoteException
+     */
     @Override
     public Object showAllFile() throws RemoteException {
-/*
-
-  //Creating a File object for directory
-      File directoryPath = new File("D:\\ExampleDirectory");
-      //List of all files and directories
-      File filesList[] = directoryPath.listFiles();
-* */
-//        String path = "C:\\Users\\Eng Alaa Alkheder\\Desktop\\"+ "UserFiles";
-        String path = "..\\Java RMI Server\\userFile\\" + name + "\\" + "UserFiles";
-        List<fileInfo> listFileInfo = new ArrayList<>();
         List<String> StringlistFileInfo = new LinkedList<>();
-        try {
-            ObjectInputStream ois = new ObjectInputStream(new FileInputStream(path));
-            listFileInfo = (ArrayList<fileInfo>) ois.readObject();
-            ois.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        for (int j = 0; j < listFileInfo.size(); j++) {
-            StringlistFileInfo.add(listFileInfo.get(i).getName());
-            System.out.println(listFileInfo.get(i).getName());
-        }
+        File[] files = new File(userFilesDirectoryPath).listFiles();
+//If this pathname does not denote a directory, then listFiles() returns null.
 
-
+        for (File file : files) {
+            if (file.isFile()) {
+                StringlistFileInfo.add(file.getName());
+                System.out.println(file.getName());
+            }
+        }
         return StringlistFileInfo;
     }
 
@@ -373,5 +420,57 @@ public class Server extends UnicastRemoteObject implements DriveInterface {
         return user;
     }
 
+    @Override
+    public void sendPublicKeyToClint(BigInteger e, BigInteger N) throws RemoteException {
+
+    }
+
+    @Override
+    public void sendPublicKeyToServer(BigInteger e, BigInteger N) throws RemoteException {
+        this.e=e;
+        this.N=N;
+        try {
+            StartServer.rsa.encryptrsa("aesKey.txt",new publicKey(e,N));
+            userInterface.sendPrivateKeyToClint(1,Files.readAllBytes(Paths.get("aesKeyEnc")));
+            Files.delete(Paths.get("aesKeyEnc"));
+//            Files.delete(Paths.get("aesKey.txt"));
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+
+
+    }
+
+    @Override
+    public void sendPrivateKeyToClint(int type, byte[] bytes) throws RemoteException {
+
+    }
+
+
+    /**
+     * private method
+     */
+
+
+    private boolean searchFile(String name) {
+        //Creating a File object for directory
+        File directoryPath = new File(filesInfoDirectoryPath);
+        //List of all files and directories
+        File filesList[] = directoryPath.listFiles();
+        for (int j = 0; j < filesList.length; j++) {
+            if (filesList[i].getName() == name)
+                return true;
+        }
+        return false;
+    }
+
+    private void defineUserPath(User user) {
+        //define User path
+        this.user = user;
+        tempPath = this.user.getPath() + "\\" + tempFile;
+        userFilesDirectoryPath = this.user.getPath() + "\\" + userFilesDirectory;
+        filesInfoDirectoryPath = this.user.getPath() + "\\" + filesInfoDirectory;
+        fileShareWithMePath = this.user.getPath() + "\\" + fileShareWithMe;
+    }
 
 }

@@ -7,10 +7,12 @@
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.MenuButton?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.effect.DropShadow?>
 <?import javafx.scene.effect.Light.Distant?>
 <?import javafx.scene.effect.Lighting?>
@@ -72,7 +74,7 @@
                                 </ImageView>
                             </graphic>
                         </Label>
-                        <Button id="uu" fx:id="UploadButton" layoutX="104.0" layoutY="495.0" mnemonicParsing="false" onAction="#UploadButtonAction" prefHeight="32.0" prefWidth="120.0" style="-fx-background-color: ffc107; -fx-border-radius: 5; -fx-border-color: c99704;" stylesheets="@ListViewStyle.css" text="Upload" textFill="#fffefe">
+                        <Button id="uu" fx:id="UploadButton" layoutX="187.0" layoutY="495.0" mnemonicParsing="false" onAction="#UploadButtonAction" prefHeight="32.0" prefWidth="120.0" style="-fx-background-color: ffc107; -fx-border-radius: 5; -fx-border-color: c99704;" stylesheets="@ListViewStyle.css" text="Upload" textFill="#fffefe">
                             <cursor>
                                 <Cursor fx:constant="HAND" />
                             </cursor>
@@ -90,17 +92,6 @@
                                 </ImageView>
                             </graphic>
                         </Button>
-                        <Button id="dd" fx:id="DownloadButton" contentDisplay="BOTTOM" layoutX="285.0" layoutY="496.0" mnemonicParsing="false" onAction="#DownloadButtonAction" prefHeight="32.0" prefWidth="120.0" style="-fx-background-color: ffc107; -fx-border-radius: 5; -fx-border-color: c99704;" stylesheets="@ListViewStyle.css" text="  Download" textFill="#fcfcfc">
-                            <cursor>
-                                <Cursor fx:constant="HAND" />
-                            </cursor>
-                            <effect>
-                                <DropShadow radius="9.75" width="20.0" />
-                            </effect>
-                            <font>
-                                <Font name="System Bold" size="14.0" />
-                            </font>
-                        </Button>
                         <ImageView fx:id="slackLogoImage" fitHeight="227.0" fitWidth="247.0" layoutX="506.0" layoutY="111.0">
                             <image>
                                 <Image url="@image/Picture13.png" />
@@ -108,11 +99,6 @@
                             <effect>
                                 <DropShadow color="#b754bc" radius="13.7075" width="35.83" />
                             </effect>
-                        </ImageView>
-                        <ImageView fx:id="downloadIcon" fitHeight="15.0" fitWidth="20.0" layoutX="294.0" layoutY="502.0">
-                            <image>
-                                <Image url="@image/download (4).png" />
-                            </image>
                         </ImageView>
                         <Label fx:id="driveLabel" layoutX="643.0" layoutY="353.0" text="Drive" textFill="#d84b80">
                             <font>
@@ -129,6 +115,60 @@
                                 </Lighting>
                             </effect>
                         </Label>
+                  <RadioButton fx:id="AES256" layoutX="515.0" layoutY="450.0" mnemonicParsing="false" onAction="#AES256Action" selected="true" text="AES-256" textFill="#743a9a">
+                     <font>
+                        <Font name="System Bold" size="18.0" />
+                     </font>
+                     <effect>
+                        <DropShadow color="#c32f2f" />
+                     </effect>
+                     <toggleGroup>
+                        <ToggleGroup fx:id="Encription" />
+                     </toggleGroup>
+                  </RadioButton>
+                  <RadioButton fx:id="RSAradioButton" layoutX="650.0" layoutY="495.0" mnemonicParsing="false" onAction="#RSAActon" text="RSA" textFill="#743a9a" toggleGroup="$Encription">
+                     <font>
+                        <Font name="System Bold" size="18.0" />
+                     </font>
+                     <effect>
+                        <DropShadow color="#c32f2f" />
+                     </effect>
+                  </RadioButton>
+                  <RadioButton fx:id="AES128" layoutX="515.0" layoutY="498.0" mnemonicParsing="false" onAction="#AES128Action" text="AES-128" textFill="#743a9a" toggleGroup="$Encription">
+                     <font>
+                        <Font name="System Bold" size="18.0" />
+                     </font>
+                     <effect>
+                        <DropShadow color="#c32f2f" />
+                     </effect>
+                  </RadioButton>
+                  <RadioButton fx:id="AES192" layoutX="650.0" layoutY="450.0" mnemonicParsing="false" onAction="#AES192Action" text="AES-192" textFill="#743a9a" toggleGroup="$Encription">
+                     <font>
+                        <Font name="System Bold" size="18.0" />
+                     </font>
+                     <effect>
+                        <DropShadow color="#c32f2f" />
+                     </effect>
+                  </RadioButton>
+                  <RadioButton fx:id="UploadFilesRadiButton" layoutX="398.0" layoutY="35.0" mnemonicParsing="false" onAction="#UploadFilesRadiButtonAction" selected="true" text="Upload Files" textFill="#bf117c">
+                     <font>
+                        <Font name="System Bold" size="18.0" />
+                     </font>
+                     <effect>
+                        <DropShadow color="#c32f2f" />
+                     </effect>
+                     <toggleGroup>
+                        <ToggleGroup fx:id="type" />
+                     </toggleGroup>
+                  </RadioButton>
+                  <RadioButton fx:id="shareRadioButton" layoutX="591.0" layoutY="36.0" mnemonicParsing="false" onAction="#shareRadioButtonAction" text="Share File With me" textFill="#bf117c" toggleGroup="$type">
+                     <font>
+                        <Font name="System Bold" size="18.0" />
+                     </font>
+                     <effect>
+                        <DropShadow color="#c32f2f" />
+                     </effect>
+                  </RadioButton>
                     </children>
                     <opaqueInsets>
                         <Insets />

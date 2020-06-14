@@ -1,3 +1,4 @@
+import java.math.BigInteger;
 import java.rmi.RemoteException;
 import java.util.LinkedList;
 
@@ -40,4 +41,18 @@ public interface DriveInterface extends java.rmi.Remote {
     Object showAllFile() throws RemoteException;
 
     Object showAllUser() throws RemoteException;
+
+    /**
+     * cryptography RSA methods
+     */
+
+    void sendPublicKeyToClint(BigInteger e, BigInteger N) throws RemoteException;
+    void sendPublicKeyToServer(BigInteger e,BigInteger N) throws RemoteException;
+
+    /**
+     * cryptography AES methods
+     */
+
+    void sendPrivateKeyToClint(int type,byte[] bytes) throws RemoteException;
+
 }

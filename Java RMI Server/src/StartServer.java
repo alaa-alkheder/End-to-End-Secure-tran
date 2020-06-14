@@ -1,3 +1,5 @@
+import AES.AES;
+import encRSA.RSA;
 import jxl.Cell;
 import jxl.Sheet;
 import jxl.Workbook;
@@ -28,11 +30,16 @@ public class StartServer {
     static final String userFile = "user.txt";
     static HashMap<String, User> userProfile = new HashMap<String, User>();
     static HashMap<String, String> user = new HashMap<String, String>();
+    static encRSA.RSA rsa = new encRSA.RSA();
+    static String privateKey= "0000000000000000000000000000000000000000000000000000000000000000";
+    static AES aes=new AES();
+
 
     /**
      * Print User info Name&password
      */
     static private void printUserPassword() {
+
         System.out.println(user.size());
         user.entrySet().forEach(entry -> {
             System.out.println(entry.getKey() + " " + entry.getValue());
@@ -189,11 +196,16 @@ public class StartServer {
         }
     }
 
-    public static void main(String[] arg) throws RemoteException, MalformedURLException {
+
+    public static void main(String[] arg) throws RemoteException, MalformedURLException,IOException {
 //        deleteAllUser();
+        FileWriter fileWriter = new FileWriter("aesKey.txt");
+        BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+        bufferedWriter.write(privateKey);
+        bufferedWriter.close();
+        fileWriter.close();
+
         ObjectInputStream objectInputStream = null;
-
-
         try {
 
             objectInputStream = new ObjectInputStream(new FileInputStream(userFile));
