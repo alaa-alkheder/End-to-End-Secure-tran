@@ -1,4 +1,7 @@
 import AES.AES;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import java.awt.*;
 import java.io.*;
@@ -110,7 +113,7 @@ public class Client extends UnicastRemoteObject implements DriveInterface, Runna
         String extension = "";
         if (path.contains("."))
             extension = path.substring(path.lastIndexOf("."));
-        server.addFileInfo(f1.getName(), fileSize, extension);
+        server.addFileInfo(f1.getName(), fileSize, extension,"default");
 
     }
 
@@ -143,17 +146,17 @@ public class Client extends UnicastRemoteObject implements DriveInterface, Runna
     }
 
     @Override
-    public String downloadFileInfo() throws RemoteException {
+    public String downloadFileInfo(String fileName) throws RemoteException {
         return "";
     }
 
     @Override
-    public void sendFileToClient(String FileName) throws RemoteException {
+    public void sendFileToClient(String FileName,int type) throws RemoteException {
 
     }
 
     @Override
-    public void addFileInfo(String filename, int len, String type) throws RemoteException {
+    public void addFileInfo(String filename, int len, String type,String encType) throws RemoteException {
 
     }
 
@@ -181,6 +184,37 @@ public class Client extends UnicastRemoteObject implements DriveInterface, Runna
 
     }
 
+    @Override
+    public boolean sendHandKeyToClint(String file) throws RemoteException {
+        JSONParser parser = new JSONParser();
+        JSONObject jsonobject;
+        Object obj = null;
+        try {
+            obj = parser.parse(file);
+        } catch (ParseException ex) {
+            ex.printStackTrace();
+        }
+        jsonobject = (JSONObject) obj;
+        if (String.valueOf(Client.rsa.getPublic_key().getE()).equals(jsonobject.get("e").toString())){
+            jsonobject.replace("handKey",Client.rsa.decryptStringRsa(jsonobject.get("handKey").toString()));
+        }
+        try (FileWriter file1 = new FileWriter(jsonobject.get("fileName").toString()+".json")) {
+            file1.write(jsonobject.toString());
+            file1.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean sendHandKeyToServer(String name, String file) throws RemoteException {
+        return false;
+    }
+
 
     @Override
     public Object showAllFile() throws RemoteException {
@@ -193,10 +227,40 @@ public class Client extends UnicastRemoteObject implements DriveInterface, Runna
     }
 
     @Override
+    public String showAllFileShareWithMEInfo() throws RemoteException {
+        return null;
+    }
+
+    @Override
+    public Boolean userStatus(String user) throws RemoteException {
+        return null;
+    }
+
+    @Override
+    public void AddPublicKeyToFile(BigInteger e, BigInteger N) throws RemoteException {
+
+    }
+
+    @Override
+    public String returnClientPublicKey(String name) throws RemoteException {
+        return null;
+    }
+
+    @Override
+    public String returnMyPublicKey() throws RemoteException {
+        JSONObject jsonObject=new JSONObject();
+        jsonObject.put("e",String.valueOf(rsa.getPublic_key().getE()));
+        jsonObject.put("n",String.valueOf(rsa.getPublic_key().getN()));
+
+        return jsonObject.toString();
+    }
+
+
+
+    @Override
     public void sendPublicKeyToClint(BigInteger e, BigInteger N) throws RemoteException {
         this.e = e;
         this.N = N;
-//        System.out.println(e+"----"+N);
     }
 
     @Override
@@ -226,6 +290,11 @@ public class Client extends UnicastRemoteObject implements DriveInterface, Runna
         } catch (ClassNotFoundException ex) {
             ex.printStackTrace();
         }
+    }
+
+    @Override
+    public void sendFileToServerDirect(byte[] byteFile, String fileName, String name) {
+
     }
 
     public void broadcastMessage(String clientname, String message) throws RemoteException {

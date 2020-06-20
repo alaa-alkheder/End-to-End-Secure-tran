@@ -14,53 +14,22 @@ public class AES
     InvSBox isb=new InvSBox();
     KeySchedule ks=new KeySchedule();
 
+    //Encryption function
     //--------------------------------------------------------------------
-    public  void en(String []h)
+    void encryption(String key,String inputFileName)
     {
-        AES aes=new AES();
-//        String h[]={"d","keyfile","inputfile.txt.txt"};
-
-        if(h.length!=3)
-        {
-            System.out.println("\n\nUsage :  java AES [e|d] keyFile inputFile.\n\nfor more details please read the README file  \n\nTerminating the program.......\n\n");
-            System.exit(0);
-        }
-
-        String inputFileName=h[2];
-        String encFileName=h[2];
-        String keyfile = h[1];
-        System.out.println(h[1]);
-        if(h[0].equals("e"))
-            aes.encryption(inputFileName,keyfile);
-        else if(h[0].equals("d"))
-            aes.decryption(encFileName,keyfile,"","");
-        else
-        {
-            System.out.println("\n\nWrong parameter used. Please either Encrypt(e) or decrypt(d) the file\n\nTerminating the Program.......\n\n");
-            System.exit(0);
-        }
-    }
-    //--------------------------------------------------------------------
-    public   void encryption(String key,String inputFileName)
-    {
-        ks.keySchedule(key); // Generate the key-full from cipher key
-
+        // Generate the key
+        ks.keySchedule(key);
         try
         {
-
-//            URL url = AES.class.getResource(inputFileName);  //for relative path
-//            String path = url.getPath();
-//            File file = new File(path);
-//            System.out.println(url.getPath());
             new base64().convert2hex(inputFileName);
             FileInputStream fstream = new FileInputStream("temphex");
             BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
             String strLine;
 
-            //creating an output text file.
-//            path=path.substring(0, path.length()-inputFileName.length());
-//            System.out.println(path);
-            String outputFileName="tempenc";
+            // Output File Name
+            File f=new File(inputFileName);
+            String outputFileName=  f.getName()+"Enc";;
             PrintWriter writer=null;
             try
             {
@@ -76,105 +45,58 @@ public class AES
             while ((strLine = br.readLine()) != null)
             {
                 int stringLength = strLine.length();
-                //System.out.println (stringLength);
-                // making length equal to 32 with padding or removing extra chars
-//				if(stringLength<32)
-//				{
-//					for(int i=0;i<(32-stringLength);i++)
-//						strLine=strLine+"0";
-//				}
-//				 if(stringLength>=32)
-//				{
-//					strLine=strLine.substring(0,32);
                 String word="";
                 int j = 0;
                 for(j=0;j<stringLength;j++){
                     word+=strLine.charAt(j);
                     if(word.length()==32){
-//                        System.out.println (word);
                         //converting the line read into column major matrix i.e. state.
                         stringToColumnMajor(word);
 
-                        //Initial AddRoundKey. Pass the round number as integer.
+                        //Initial Add RoundKey
                         addRoundKey(0);
-                        //Next 13 rounds
-//                        System.out.println("After addRoundKey(0)");
-//                        printStateLine();
+
                         for(int i=1;i<=14;i++)
                         {
                             subByte();
-//                            System.out.println("After subByte");
-//                            printStateLine();
                             shiftRow();
-//                            System.out.println("After shiftRow");
-//                            printStateLine();
                             if(i!=14)
-                            {
                                 mixColumn();
-//                                System.out.println("After mixColumn");
-//                                printStateLine();
-                            }
+
                             addRoundKey(i);
-//                            System.out.println("After addRoundKey("+i+")");
-//                            printStateLine();
                         }
 
-//                        System.out.println("The Cipher Text is : ");
-//                        printState();
-
-                        //Writing to output file
+                        // Write Output To File
                         String enc=columnMajorToString();
-                        //System.out.println("The Cipher Text is : "+enc);
                         writer.write(enc);
                         word="";
                     }
                 }
 
                 if(!word.equals("")){
+                    // Padding Zeros To 32 Char
                     int k=32-(word.length()%32);
                     for(int i=0;i<k;i++)
                         word+="0";
-//                    System.out.println (word);
-                    //converting the line read into column major matrix i.e. state.
+
                     stringToColumnMajor(word);
 
-                    //Initial AddRoundKey. Pass the round number as integer.
+                    //Initial AddRoundKey.
                     addRoundKey(0);
-                    //Next 13 rounds
-//                    System.out.println("After addRoundKey(0)");
-//                    printStateLine();
                     for(int i=1;i<=14;i++)
                     {
                         subByte();
-//                        System.out.println("After subByte");
-//                        printStateLine();
                         shiftRow();
-//                        System.out.println("After shiftRow");
-//                        printStateLine();
                         if(i!=14)
-                        {
                             mixColumn();
-//                            System.out.println("After mixColumn");
-//                            printStateLine();
-                        }
+
                         addRoundKey(i);
-//                        System.out.println("After addRoundKey("+i+")");
-//                        printStateLine();
                     }
 
-//                    System.out.println("The Cipher Text is : ");
-//                    printState();
-
-                    //Writing to output file
+                    //W Write Output To File
                     String enc=columnMajorToString();
-                    //System.out.println("The Cipher Text is : "+enc);
                     writer.write(enc);
                 }
-
-//				}
-
-
-
             }
             writer.close();
             br.close();
@@ -183,7 +105,6 @@ public class AES
         catch(Exception e)
         {
             e.printStackTrace();
-            System.out.println("Please check if all filenames are correct. Files should exist in the same folder.");
         }
 
         try {
@@ -193,7 +114,7 @@ public class AES
         }
 
 
-    }//Encryption function ends here.
+    }
 
     //--------------------------------------------------------------------
     void stringToColumnMajor(String str)
@@ -210,7 +131,6 @@ public class AES
     //--------------------------------------------------------------------
     void printState()
     {
-        //System.out.println("Printing State -------");
         for(int i=0;i<4;i++)
         {
             for(int j=0;j<4;j++)
@@ -221,36 +141,13 @@ public class AES
         }
 
     }
-//--------------------------------------------------------------------
-
-    void printStateLine()
-    {
-
-        for(int i=0;i<4;i++)
-        {
-            for(int j=0;j<4;j++)
-            {
-                System.out.print(state[j][i].toUpperCase());
-            }
-        }
-        System.out.println();
-    }
-
-
 
     String columnMajorToString()
     {
         String str="";
         for(int i=0;i<4;i++)
-        {
             for(int j=0;j<4;j++)
-            {
                 str=str+state[j][i].toUpperCase();
-                //System.out.print(str);
-
-            }
-        }
-        //System.out.println();
         return str;
     }
     //--------------------------------------------------------------------
@@ -317,18 +214,13 @@ public class AES
             for(int j=0;j<4;j++)
             {
                 int a = of.rM(state[0][i], matrix[j][0]);
-                //System.out.println("---------------"+Integer.toHexString(a));
                 int b = of.rM(state[1][i], matrix[j][1]);
-                //System.out.println("---------------"+Integer.toHexString(b));
                 int c = of.rM(state[2][i], matrix[j][2]);
-                //System.out.println("---------------"+Integer.toHexString(c));
                 int d = of.rM(state[3][i], matrix[j][3]);
-                //System.out.println("---------------"+Integer.toHexString(d));
                 int e = a^b^c^d;
                 String s=Integer.toHexString(e);
                 if (s.length()==1)
                     s="0"+s;
-                //System.out.println(s);
                 temp[j]=s;
             }
             state[0][i]=temp[0];
@@ -339,28 +231,21 @@ public class AES
 
     }
 
-//--------------------------------------------------------------------
-//--------------------------------------------------------------------
-    //Decryption function starts here.
 
-    public void decryption(String key,String encFileName,String fileName,String fileType)
+//--------------------------------------------------------------------
+    //Decryption function
+
+ public void decryption(String key, String encFileName, String fileName, String fileType)
     {
-        ks.keySchedule(key); // Generate the key-full from cipher key
-
+        // Generate the key
+        ks.keySchedule(key);
         try
         {
-
-//            URL url = AES.class.getResource(encFileName);  //for relative path
-//            String path = url.getPath();
-//            File file = new File(encFileName);
-            //System.out.println(url.getPath());
             FileInputStream fstream = new FileInputStream(encFileName);
             BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
             String strLine;
 
-            //creating an output text file.
-//            path=path.substring(0, path.length()-encFileName.length());
-            //System.out.println(path);
+            //Output File Name
             String outputFileName="tempdec";
             PrintWriter writer=null;
             try
@@ -376,64 +261,27 @@ public class AES
             while ((strLine = br.readLine()) != null)
             {
                 int stringLength = strLine.length();
-                //System.out.println (stringLength);
-                // making length equal to 32 with padding or removing extra chars
-//				if(stringLength<32)
-//				{
-//					for(int i=0;i<(32-stringLength);i++)
-//						strLine=strLine+"0";
-//				}
-//				 if(stringLength>=32)
-//				{
-//					strLine=strLine.substring(0,32);
                 String word="";
                 int j = 0;
                 for(j=0;j<stringLength;j++){
                     word+=strLine.charAt(j);
                     if(word.length()==32){
-//                        System.out.println (word);
-                        //converting the line read into column major matrix i.e. state.
                         stringToColumnMajor(word);
-
-                        //Initial AddRoundKey. Pass the round number as integer.
-                        addRoundKey(0);
-                        //Next 13 rounds
-//                        System.out.println("After addRoundKey(0)");
-//                        printStateLine();
                         for(int i=14;i>=1;i--)
                         {
                             addRoundKey(i);
-//                            System.out.println("After addRoundKey("+i+")");
-//                            printStateLine();
-
                             if(i!=14)
-                            {
                                 invMixColumn();
-//                                System.out.println("After mixColumn");
-//                                printStateLine();
-                            }
 
                             invShiftRow();
-//                            System.out.println("After shiftRow");
-//                            printStateLine();
-
                             invSubByte();
-//                            System.out.println("After subByte");
-//                            printStateLine();
-
-
 
                         }
-                        //Initial AddRoundKey. Pass the round number as integer.
+                        //Initial Add RoundKey
                         addRoundKey(0);
-//                        System.out.println("After addRoundKey(0)");
-//                        printStateLine();
-//                        System.out.println("The Plain Text is : ");
-//                        printState();
 
-                        //Writing to output file
+                        // Write Output To File
                         String dec=columnMajorToString();
-                        //System.out.println("The Cipher Text is : "+dec);
                         writer.write(dec);
                         word="";
                     }
@@ -443,56 +291,25 @@ public class AES
                     int k=32-(word.length()%32);
                     for(int i=0;i<k;i++)
                         word+="0";
-//                    System.out.println (word);
-                    //converting the line read into column major matrix i.e. state.
+
                     stringToColumnMajor(word);
 
-                    //Initial AddRoundKey. Pass the round number as integer.
-                    addRoundKey(0);
-                    //Next 13 rounds
-//                    System.out.println("After addRoundKey(0)");
-//                    printStateLine();
                     for(int i=14;i>=1;i--)
                     {
                         addRoundKey(i);
-//                        System.out.println("After addRoundKey("+i+")");
-//                        printStateLine();
-
                         if(i!=14)
-                        {
                             invMixColumn();
-//                            System.out.println("After mixColumn");
-//                            printStateLine();
-                        }
 
                         invShiftRow();
-//                        System.out.println("After shiftRow");
-//                        printStateLine();
-
                         invSubByte();
-//                        System.out.println("After subByte");
-//                        printStateLine();
-
-
-
                     }
-                    //Initial AddRoundKey. Pass the round number as integer.
+                    //Initial Add RoundKey
                     addRoundKey(0);
-//                    System.out.println("After addRoundKey(0)");
-//                    printStateLine();
-//                    System.out.println("The Plain Text is : ");
-//                    printState();
 
-                    //Writing to output file
+                    // Write Output To File
                     String dec=columnMajorToString();
-                    //System.out.println("The Cipher Text is : "+dec);
                     writer.write(dec);
                 }
-
-//				}
-
-
-
             }
             writer.close();
             br.close();
@@ -503,19 +320,18 @@ public class AES
             e.printStackTrace();
         }
 
+        // Decoding The File After Decryption
         try {
             new base64().decode2file("tempdec",fileName,fileType);
         } catch (IOException e) {
             e.printStackTrace();
         }
+        // Delete Temp File After Decoding
         try {
             Files.deleteIfExists(Paths.get("tempdec"));
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
-
 
     }
 
@@ -571,18 +387,13 @@ public class AES
             for(int j=0;j<4;j++)
             {
                 int a = of.rM(state[0][i], matrix[j][0]);
-                //System.out.println("---------------"+Integer.toHexString(a));
                 int b = of.rM(state[1][i], matrix[j][1]);
-                //System.out.println("---------------"+Integer.toHexString(b));
                 int c = of.rM(state[2][i], matrix[j][2]);
-                //System.out.println("---------------"+Integer.toHexString(c));
                 int d = of.rM(state[3][i], matrix[j][3]);
-                //System.out.println("---------------"+Integer.toHexString(d));
                 int e = a^b^c^d;
                 String s=Integer.toHexString(e);
                 if (s.length()==1)
                     s="0"+s;
-                //System.out.println(s);
                 temp[j]=s;
             }
             state[0][i]=temp[0];

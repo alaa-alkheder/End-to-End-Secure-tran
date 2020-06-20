@@ -20,9 +20,6 @@ public class Main {
         String pathOfEncryptedFile = "tempenc",fileType = ".rar";
         new AES().decryption(key,pathOfEncryptedFile,f.getName(),fileType);
         System.out.println(key);
-//        System.out.println(getRandomKey(32));
-//        System.out.println(getRandomKey(48));
-//        System.out.println(getRandomKey(64));
     }
 
     static public String getRandomKey(int length){

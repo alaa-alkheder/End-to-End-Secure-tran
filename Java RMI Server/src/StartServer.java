@@ -27,11 +27,13 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Github:alaa-alkheder
  */
 public class StartServer {
+    //to save user profile
     static final String userFile = "user.txt";
+
     static HashMap<String, User> userProfile = new HashMap<String, User>();
     static HashMap<String, String> user = new HashMap<String, String>();
     static encRSA.RSA rsa = new encRSA.RSA();
-    static String privateKey= "0000000000000000000000000000000000000000000000000000000000000000";
+    static String privateKey= "1111111111111111111111111111111111111111111111111111111111111111";
     static AES aes=new AES();
 
 
@@ -57,8 +59,8 @@ public class StartServer {
             Sheet sheet = workbook.getSheet(0);
             int row = sheet.getRows();
             int col = sheet.getColumns();
-            System.out.println(row);
-            System.out.println(col);
+//            System.out.println(row);
+//            System.out.println(col);
             for (int i = 0; i < row; i++) {
                 for (int j = 0; j < col; j++) {
                     Cell name = sheet.getCell(0, i);
@@ -76,7 +78,7 @@ public class StartServer {
 
 
     /**
-     * save User info (Name&password) and save in the HashMap
+     * save User info (Name&password) and save  the HashMap in excel file
      */
     static void saveUserPassword() {
         File f1 = new File("D:\\User.xls");

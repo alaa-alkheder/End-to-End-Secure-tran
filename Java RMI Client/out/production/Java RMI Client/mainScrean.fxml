@@ -14,7 +14,7 @@
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.effect.DropShadow?>
-<?import javafx.scene.effect.Light.Distant?>
+
 <?import javafx.scene.effect.Lighting?>
 <?import javafx.scene.effect.Shadow?>
 <?import javafx.scene.image.Image?>
@@ -74,7 +74,7 @@
                                 </ImageView>
                             </graphic>
                         </Label>
-                        <Button id="uu" fx:id="UploadButton" layoutX="187.0" layoutY="495.0" mnemonicParsing="false" onAction="#UploadButtonAction" prefHeight="32.0" prefWidth="120.0" style="-fx-background-color: ffc107; -fx-border-radius: 5; -fx-border-color: c99704;" stylesheets="@ListViewStyle.css" text="Upload" textFill="#fffefe">
+                        <Button id="uu" fx:id="UploadButton" layoutX="128.0" layoutY="495.0" mnemonicParsing="false" onAction="#UploadButtonAction" prefHeight="32.0" prefWidth="120.0" style="-fx-background-color: ffc107; -fx-border-radius: 5; -fx-border-color: c99704;" stylesheets="@ListViewStyle.css" text="Upload" textFill="#fffefe">
                             <cursor>
                                 <Cursor fx:constant="HAND" />
                             </cursor>
@@ -169,6 +169,24 @@
                         <DropShadow color="#c32f2f" />
                      </effect>
                   </RadioButton>
+                  <Button fx:id="DirectSharingButton" layoutX="302.0" layoutY="498.0" mnemonicParsing="false" onAction="#DirectSharingAction" prefHeight="32.0" prefWidth="141.0" style="-fx-background-color: f4427e; -fx-border-radius: 5; -fx-border-color: c99704;" text="Direct Sharing" textFill="#fffefe">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                     <font>
+                        <Font name="System Bold" size="14.0" />
+                     </font>
+                     <graphic>
+                        <ImageView fx:id="UploadIcon1" fitHeight="15.0" fitWidth="20.0">
+                           <image>
+                              <Image url="@image/upload.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                     <effect>
+                        <DropShadow height="20.5" radius="9.625" width="20.0" />
+                     </effect>
+                  </Button>
                     </children>
                     <opaqueInsets>
                         <Insets />
@@ -434,9 +452,7 @@
                                             <bumpInput>
                                                 <Shadow />
                                             </bumpInput>
-                                            <light>
-                                                <Light.Distant />
-                                            </light>
+
                                         </Lighting>
                                     </effect>
                                 </Label>
@@ -495,9 +511,7 @@
                                                     <bumpInput>
                                                         <Shadow />
                                                     </bumpInput>
-                                                    <light>
-                                                        <Light.Distant azimuth="360.0" color="#21db1fe0" elevation="78.49" />
-                                                    </light>
+
                                                 </Lighting>
                                             </effect>
                                         </Label>
@@ -519,9 +533,7 @@
                                                     </input>
                                                 </Shadow>
                                             </bumpInput>
-                                            <light>
-                                                <Light.Distant color="#5bd74e" />
-                                            </light>
+
                                         </Lighting>
                                     </effect>
                                 </HBox>
@@ -540,9 +552,7 @@
                                             <bumpInput>
                                                 <Shadow />
                                             </bumpInput>
-                                            <light>
-                                                <Light.Distant azimuth="0.0" color="#2f8a2de0" elevation="78.49" />
-                                            </light>
+
                                         </Lighting>
                                     </effect>
                                 </Label>

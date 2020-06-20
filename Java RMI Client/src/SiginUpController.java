@@ -4,6 +4,7 @@
  * and open the template in the editor.
  */
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -17,6 +18,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
+import jdk.nashorn.internal.ir.debug.JSONWriter;
+import org.json.simple.JSONObject;
 
 /**
  * FXML Controller class
@@ -82,7 +85,25 @@ public class SiginUpController implements Initializable {
         user.setBirthday(date.getValue().toString()); //Add birthday
         user.setPhone(phoneTextTield1.getText());
       Boolean  b = Client.server.registerUser(user);
+
     if (b) {
+
+         encRSA.RSA rsa = new encRSA.RSA();
+        JSONObject jsonObject=new JSONObject();
+        jsonObject.put("e",rsa.getPublic_key().getE());
+        jsonObject.put("n",rsa.getPublic_key().getN());
+        jsonObject.put("d",rsa.getD());
+          try (FileWriter file = new FileWriter("publicKey.json")) {
+            file.write(jsonObject.toString());
+            file.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+          Client.server.AddPublicKeyToFile(rsa.getPublic_key().getE(),rsa.getPublic_key().getN());
+
         Parent root1 = FXMLLoader.load(getClass().getResource("mainScrean.fxml"));
         Stage stage1 = new Stage();
         Scene scene1 = new Scene(root1);

@@ -12,10 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -53,8 +50,6 @@ public class Server extends UnicastRemoteObject implements DriveInterface {
      */
     BigInteger e;
     BigInteger N;
-
-
 
 
     //    private static final long serialVersionUID = 1L;
@@ -95,8 +90,8 @@ public class Server extends UnicastRemoteObject implements DriveInterface {
             //send massage to test the connection =>for programmer delete in product version
             chatinterface.sendMessageToClient(0, "Test Connection ");
             defineUserPath(StartServer.userProfile.get(clientname));
-            chatinterface.sendPublicKeyToClint(StartServer.rsa.getPublic_key().getE(),StartServer.rsa.getPublic_key().getN());
-            System.out.println(StartServer.rsa.getPublic_key().getE()+"----"+StartServer.rsa.getPublic_key().getN());
+            chatinterface.sendPublicKeyToClint(StartServer.rsa.getPublic_key().getE(), StartServer.rsa.getPublic_key().getN());
+            System.out.println(StartServer.rsa.getPublic_key().getE() + "----" + StartServer.rsa.getPublic_key().getN());
             return true;//if you login done
         }
         return false;//if happen any problem
@@ -131,7 +126,7 @@ public class Server extends UnicastRemoteObject implements DriveInterface {
 
             try {
                 obj = parser.parse(new FileReader(path));
-                obj1 = parser.parse(new FileReader(filesInfoDirectoryPath + "\\" + fileName + jsonExtension));
+                obj1 = parser.parse(new FileReader(filesInfoDirectoryPath + "\\" + fileName + "Enc" + jsonExtension));
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (ParseException e) {
@@ -140,24 +135,20 @@ public class Server extends UnicastRemoteObject implements DriveInterface {
 
             jsonobject = (JSONObject) obj;
             JSONObject jsontemp = (JSONObject) obj1;
-
-
-            System.out.println("11111");
             JSONObject jo = new JSONObject();
             jo.put("fileName", fileName);
             jo.put("from", name);
             jo.put("type", (String) jsontemp.get("type"));
             System.out.println(jsontemp.get("len"));
             jo.put("len", jsontemp.get("len"));
-            jo.put("path", filesInfoDirectoryPath + "\\" + fileName);
-            ;
+            jo.put("path", userFilesDirectoryPath + "\\" + fileName);
             String n = ((String) jsonobject.get("n"));
             int x = Integer.parseInt(n);
             x++;
             n = String.valueOf(x);
             jsonobject.replace("n", n);
             jsonobject.put("file" + x, jo.toJSONString());
-            System.out.println("222222");
+
             try (FileWriter file = new FileWriter(path)) {
                 file.write(jsonobject.toString());
                 file.flush();
@@ -238,11 +229,12 @@ public class Server extends UnicastRemoteObject implements DriveInterface {
             file.write(jsonObject.toString());
             file.flush();
 
-        } catch (IOException e) {
-            e.printStackTrace();
+            createHandShaking(user.getUniqueName());
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } catch (ParseException ex) {
+            ex.printStackTrace();
         }
-
-
         //Save user object in the
         StartServer.userProfile.put(user.getUniqueName(), user);
         StartServer.user.put(user.getUniqueName(), user.getPassword());
@@ -252,8 +244,13 @@ public class Server extends UnicastRemoteObject implements DriveInterface {
     }
 
 
-    public void sendFileToClient(String FileName) throws RemoteException {
+    public void sendFileToClient(String FileName, int type) throws RemoteException {
+        System.err.println(FileName);
         String path = userFilesDirectoryPath + "\\" + FileName;
+        if (type == 1) {//use when we click download in file share with me view
+
+            path = FileName;
+        }
         File f1 = new File(path);
         int fileSize = 0;
         int timer = 0;
@@ -315,23 +312,41 @@ public class Server extends UnicastRemoteObject implements DriveInterface {
     }
 
     @Override
-    public String downloadFileInfo() throws RemoteException {
-/*
-  JSONParser parser = new JSONParser();
-    JSONObject jsonobject;
-    Object obj;
-    File select;
-
-  obj = parser.parse(new FileReader(select));
-            jsonobject = (JSONObject) obj;
-//            ArrayList<Character> alphabet = (ArrayList<Character>) jsonobject.get("alphabet");
-            alphabet = (String) jsonobject.get("alphabet");
-            alphabet = alphabet.toLowerCase();
-
-
- */
-        return "sssssss";
+    public String downloadFileInfo(String fileName) throws RemoteException {
+        JSONParser parser = new JSONParser();
+        JSONObject jsonobject;
+        Object obj = null;
+        try {
+            obj = parser.parse(new FileReader(filesInfoDirectoryPath + "\\" + fileName + "Enc" + jsonExtension));
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } catch (ParseException ex) {
+            ex.printStackTrace();
+        }
+        jsonobject = (JSONObject) obj;
+        return jsonobject.toString();
     }
+
+    @Override
+    public boolean sendHandKeyToClint(String file) throws RemoteException {
+        return false;
+    }
+
+    @Override
+    public boolean sendHandKeyToServer(String name, String file) throws RemoteException {
+        for (HashMap.Entry<String, DriveInterface> entry : userClient.entrySet()) {
+            if (entry.getKey().equals(name)) {//the user is online
+                entry.getValue().sendHandKeyToClint(file);
+                System.out.println("user "+entry.getKey()+"is online");
+            } else {//user is offline
+
+            }
+
+
+        }
+        return false;
+    }
+
 
     int i = 0;//test delete after the finish code
 
@@ -355,13 +370,14 @@ public class Server extends UnicastRemoteObject implements DriveInterface {
     }
 
     @Override
-    public void addFileInfo(String filename, int len, String type) throws RemoteException {
+    public void addFileInfo(String filename, int len, String type, String encType) throws RemoteException {
         //!!!!check if the file uploaded use searchFile();
         System.out.println(" ADD FILE INFO method  --- file info" + filename);
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("filename", filename);
         jsonObject.put("len", len);
         jsonObject.put("type", type);
+        jsonObject.put("keyType", encType);
         try (FileWriter file = new FileWriter(filesInfoDirectoryPath + "\\" + filename + jsonExtension)) {
             file.write(jsonObject.toString());
             file.flush();
@@ -378,8 +394,7 @@ public class Server extends UnicastRemoteObject implements DriveInterface {
 //        } catch (ClassNotFoundException ex) {
 //            ex.printStackTrace();
 //        }
-StartServer.aes.decryption(StartServer.privateKey,userFilesDirectoryPath+"\\"+"tempenc","alaa",type);
-
+        StartServer.aes.decryption(StartServer.privateKey, userFilesDirectoryPath + "\\" + filename, "alaa", type);
 
 
     }
@@ -421,18 +436,125 @@ StartServer.aes.decryption(StartServer.privateKey,userFilesDirectoryPath+"\\"+"t
     }
 
     @Override
+    public String showAllFileShareWithMEInfo() throws RemoteException {
+
+        JSONParser parser = new JSONParser();
+        JSONObject jsonobject;
+        Object obj = null;
+
+        try {
+            obj = parser.parse(new FileReader(fileShareWithMePath));
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } catch (ParseException ex) {
+            ex.printStackTrace();
+        }
+        jsonobject = (JSONObject) obj;
+        return jsonobject.toString();
+    }
+
+    @Override
+    public Boolean userStatus(String user) throws RemoteException {
+        for (Map.Entry<String, DriveInterface> entry : userClient.entrySet()) {
+            if (user.equals(entry.getKey())) ;
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void AddPublicKeyToFile(BigInteger EE, BigInteger NN) throws RemoteException {
+        String path = "publicKey.json";
+        JSONParser parser = new JSONParser();
+        JSONObject jsonobject = new JSONObject();
+        Object obj = null;
+        try {
+            obj = parser.parse(new FileReader(path));
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } catch (ParseException ex) {
+            ex.printStackTrace();
+        }
+        jsonobject = (JSONObject) obj;
+        int i = Integer.parseInt(String.valueOf(jsonobject.get("i")));
+        i++;
+        JSONObject js = new JSONObject();
+        js.put("user", name);
+        js.put("e", EE);
+        js.put("n", NN);
+        jsonobject.put("i" + i, js.toJSONString());
+        jsonobject.replace("i", String.valueOf(i));
+        try (FileWriter file = new FileWriter(path)) {
+            file.write(jsonobject.toString());
+            file.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public String returnClientPublicKey(String name) throws RemoteException {
+
+        for (Map.Entry<String, DriveInterface> entry : userClient.entrySet()) {
+            if (name.equals(entry.getKey())) {
+                System.out.println(name + "*-**********" + entry.getKey());
+
+
+                return entry.getValue().returnMyPublicKey();
+            }
+        }     //user is offline
+        JSONParser parser = new JSONParser();
+        JSONParser parser1 = new JSONParser();
+        JSONObject jsonobject = new JSONObject();
+        Object obj = null;
+        try {
+            obj = parser.parse(new FileReader("publicKey.json"));
+
+            jsonobject = (JSONObject) obj;
+            System.out.println("jsonobject.get(\"i\")" + jsonobject.get("i"));
+            for (int i = 1; i <= Integer.parseInt(String.valueOf(jsonobject.get("i"))); i++) {
+//                Object st = jsonobject.get("i" + i);
+//                System.out.println("st : "+jsonobject.get("i"+i).toString());
+//
+//                JSONObject jsonObject1 = (JSONObject) parser.parse(jsonobject.get("i"+i).toString());
+
+                JSONObject jsonObject1 = (JSONObject) parser1.parse(jsonobject.get("i" + i).toString());
+                if (jsonObject1.get("user").toString().equals(name)) {
+                    System.out.println("jsonobject.get(\"name\")" + jsonObject1.get("user"));
+
+                    return jsonObject1.toString();
+                }
+            }
+        } catch (ParseException | FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        return "";
+    }
+
+    @Override
+    public String returnMyPublicKey() throws RemoteException {
+        return null;
+    }
+
+
+    @Override
     public void sendPublicKeyToClint(BigInteger e, BigInteger N) throws RemoteException {
 
     }
 
     @Override
     public void sendPublicKeyToServer(BigInteger e, BigInteger N) throws RemoteException {
-        this.e=e;
-        this.N=N;
+        this.e = e;
+        this.N = N;
         try {
-            StartServer.rsa.encryptrsa("aesKey.txt",new publicKey(e,N));
-            userInterface.sendPrivateKeyToClint(1,Files.readAllBytes(Paths.get("aesKeyEnc")));
-            Files.delete(Paths.get("aesKeyEnc"));
+            System.out.println("////" + e + "*****" + N);
+            StartServer.rsa.encryptrsa("aesKey.txt", new publicKey(e, N));
+            userInterface.sendPrivateKeyToClint(1, Files.readAllBytes(Paths.get("aesKeyEnc")));
+//            Files.delete(Paths.get("aesKeyEnc"));
 //            Files.delete(Paths.get("aesKey.txt"));
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -443,6 +565,20 @@ StartServer.aes.decryption(StartServer.privateKey,userFilesDirectoryPath+"\\"+"t
 
     @Override
     public void sendPrivateKeyToClint(int type, byte[] bytes) throws RemoteException {
+
+    }
+
+    @Override
+    public void sendFileToServerDirect(byte[] byteFile, String fileName, String name) {
+        try {
+            FileOutputStream out = new FileOutputStream("userFile\\"+name+"\\test\\"+fileName);
+            out.write(byteFile);
+            out.close();
+        } catch (FileNotFoundException ex) {
+            ex.printStackTrace();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
 
     }
 
@@ -473,4 +609,43 @@ StartServer.aes.decryption(StartServer.privateKey,userFilesDirectoryPath+"\\"+"t
         fileShareWithMePath = this.user.getPath() + "\\" + fileShareWithMe;
     }
 
+    private void createHandShaking(String name) throws IOException, ParseException {
+        String path = "handShakingKey.json";
+        JSONParser parser = new JSONParser();
+        JSONObject jsonobject = new JSONObject();
+        Object obj = null;
+        obj = parser.parse(new FileReader(path));
+        jsonobject = (JSONObject) obj;
+        int i = Integer.parseInt(String.valueOf(jsonobject.get("i")));
+        i++;
+        for (Map.Entry<String, String> entry : StartServer.user.entrySet()) {
+            JSONObject js = new JSONObject();
+            js.put("user1", entry.getKey());
+            js.put("user2", name);
+            js.put("key265", getRandomKey(64));
+            js.put("key192", getRandomKey(48));
+            js.put("key128", getRandomKey(32));
+            jsonobject.put("i" + i, js.toJSONString());
+            i++;
+        }
+        jsonobject.replace("i", String.valueOf(i));
+        try (FileWriter file = new FileWriter(path)) {
+            file.write(jsonobject.toString());
+            file.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
+    private String getRandomKey(int length) {
+        Random rand = new Random();
+        StringBuffer sb = new StringBuffer();
+        while (sb.length() < length)
+            sb.append(Integer.toHexString(rand.nextInt()));
+        return sb.toString().substring(0, length);
+    }
 }

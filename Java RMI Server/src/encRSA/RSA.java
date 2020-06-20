@@ -85,7 +85,7 @@ public class RSA {
 
     public void encryptrsa(String path, publicKey public_key) throws IOException {
         base64.ecryptTo64(path);
-        File f = new File(path);
+//        File f = new File(path);
         blockList s = new blockList();
         byte[] mydata = new byte[blocksize];
         FileInputStream in = null;

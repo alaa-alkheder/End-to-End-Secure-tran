@@ -130,7 +130,7 @@ public class workshopController implements Initializable {
             HBox hBox = new HBox();
             hBox.setPadding(new Insets(12, 10, 12, 10));
             hBox.setSpacing(50);
-           // fileSelectedList1.setStyle("-fx-Border-color:#c99704; -fx-Border-width:20 ;");
+           // fileSelectedList1.setStyle("-fx-Border-color:#c99704;   ");
             hBox.setCursor(Cursor.DEFAULT);
 
             ImageView info = null;

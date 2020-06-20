@@ -4,6 +4,7 @@ import java.io.*;
 import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Base64;
 import java.util.Random;
 
 public class RSA {
@@ -19,7 +20,7 @@ public class RSA {
     static private int blocksize = 128;
 
 
-     static public String getfilename(String pathFile) {
+    static public String getfilename(String pathFile) {
         int pos = pathFile.lastIndexOf(".");
         if (pos == -1)
             return pathFile;
@@ -28,6 +29,10 @@ public class RSA {
 
     public publicKey getPublic_key() {
         return public_key;
+    }
+
+    public BigInteger getD() {
+        return d;
     }
 
     private publicKey public_key;
@@ -79,8 +84,8 @@ public class RSA {
         FileOutputStream fileOuputStream = null;
         try {
             fileOuputStream = new FileOutputStream(fileDest, true);
-            System.out.println(len);
-            System.err.println(bFile.length);
+//            System.out.println(len);
+//            System.err.println(bFile.length);
             if (len < 1) return;
             fileOuputStream.write(bFile, 0, len);
 
@@ -127,6 +132,7 @@ public class RSA {
     }
 
     public void deccryptrsa(String pathFileToDecrypt, String fileName, String filePath) throws IOException, ClassNotFoundException {
+//        System.out.println("@@@@@@@@@@@@"+e+"#######"+N);
         pathFileToDecrypt = getfilename(pathFileToDecrypt);
         blockList so = new blockList();
         ObjectInputStream oi = new ObjectInputStream(new FileInputStream(pathFileToDecrypt));
@@ -146,5 +152,25 @@ public class RSA {
 
     }
 
+    public String encryptStringRsa(String message, BigInteger e, BigInteger N) {
+        byte b[] = message.getBytes();
+        return Base64.getEncoder().encodeToString(encrypt(b, new publicKey(e, N)));
+    }
 
+    public String decryptStringRsa(String message) {
+
+        byte b[] = Base64.getDecoder().decode(message);
+        String temp = new String(decrypt(b));
+        return temp;
+    }
+
+    private byte[] decryptWithD(byte[] message, BigInteger N, BigInteger d) {
+        return (new BigInteger(message)).modPow(d, N).toByteArray();
+    }
+
+    public String decryptStringRsaWithD(String message, BigInteger N, BigInteger d) {
+        byte b[] = message.getBytes();
+        String temp = new String(decryptWithD(b, N, d));
+        return temp;
+    }
 }
