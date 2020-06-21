@@ -33,6 +33,9 @@ public class Server extends UnicastRemoteObject implements DriveInterface {
     public final String filesInfoDirectory = "fileInfo";
     //this file saves files path that have been shared with me
     public final String fileShareWithMe = "fileShareWithMe.json";
+    //this file saves files ...............
+    public final String DirectShareFiles = "DirectShareFiles";
+    public final String DirectShareFilesInfo = "DirectShareFilesInfo";
     //
     public final String jsonExtension = ".json";
 
@@ -43,6 +46,8 @@ public class Server extends UnicastRemoteObject implements DriveInterface {
     public String userFilesDirectoryPath;
     public String filesInfoDirectoryPath;
     public String fileShareWithMePath;
+    public String DirectShareFilesPath;
+    public String DirectShareFilesInfoPath;
 
 
     /**
@@ -192,7 +197,7 @@ public class Server extends UnicastRemoteObject implements DriveInterface {
      * @throws RemoteException
      */
     @Override
-    public Boolean registerUser(User user) throws RemoteException {
+    public Boolean registerUser(DriveInterface chatinterface,User user) throws RemoteException {
         //check the user if exits
         if (StartServer.SearchUserName(user.getUniqueName()))
             return false;
@@ -201,6 +206,11 @@ public class Server extends UnicastRemoteObject implements DriveInterface {
         name = user.getUniqueName();
         File f = new File(path1);
         boolean b = f.mkdir();
+        this.clientList.add(chatinterface);
+        userInterface = chatinterface;
+        userClient.put(name, chatinterface);
+        //send massage to test the connection =>for programmer delete in product version
+        chatinterface.sendMessageToClient(0, "Test Connection ");
         if (b) {
             user.setPath(path1);
 
@@ -217,11 +227,16 @@ public class Server extends UnicastRemoteObject implements DriveInterface {
         File Userfiles = new File(userFilesDirectoryPath);
         //
         File fileInfo = new File(filesInfoDirectoryPath);
+
+        File fileDirectShare = new File(DirectShareFilesPath);
+        File DirectShareFilesInfo = new File(DirectShareFilesInfoPath);
 //        //create new Files
         try {
             tempfile.createNewFile();
             Userfiles.mkdir();
             fileInfo.mkdir();
+            fileDirectShare.mkdir();
+            DirectShareFilesInfo.mkdir();
             //
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("n", "0");
@@ -244,12 +259,17 @@ public class Server extends UnicastRemoteObject implements DriveInterface {
     }
 
 
-    public void sendFileToClient(String FileName, int type) throws RemoteException {
+    public void sendFileToClient(String FileName, int type,int downloadType) throws RemoteException {
+        String path="";
+        if(downloadType == 0){//0 is share with me file without hand key
+              path = userFilesDirectoryPath + "\\" + FileName;
+        }
         System.err.println(FileName);
-        String path = userFilesDirectoryPath + "\\" + FileName;
-        if (type == 1) {//use when we click download in file share with me view
 
-            path = FileName;
+        if (downloadType == 1) {//use when we click download in file share with me view
+
+            path = DirectShareFilesPath+"\\"+FileName;
+            System.out.println("**************"+path);
         }
         File f1 = new File(path);
         int fileSize = 0;
@@ -317,7 +337,7 @@ public class Server extends UnicastRemoteObject implements DriveInterface {
         JSONObject jsonobject;
         Object obj = null;
         try {
-            obj = parser.parse(new FileReader(filesInfoDirectoryPath + "\\" + fileName + "Enc" + jsonExtension));
+            obj = parser.parse(new FileReader(DirectShareFilesInfoPath + "\\" + fileName  + jsonExtension));
         } catch (IOException ex) {
             ex.printStackTrace();
         } catch (ParseException ex) {
@@ -337,7 +357,7 @@ public class Server extends UnicastRemoteObject implements DriveInterface {
         for (HashMap.Entry<String, DriveInterface> entry : userClient.entrySet()) {
             if (entry.getKey().equals(name)) {//the user is online
                 entry.getValue().sendHandKeyToClint(file);
-                System.out.println("user "+entry.getKey()+"is online");
+                System.out.println("user " + entry.getKey() + "is online");
             } else {//user is offline
 
             }
@@ -345,6 +365,24 @@ public class Server extends UnicastRemoteObject implements DriveInterface {
 
         }
         return false;
+    }
+
+    @Override
+    public void addFileInfoDirect(String name, String fileName, int size, String type, String encType) throws RemoteException {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("filename", fileName);
+        jsonObject.put("size", size);
+        jsonObject.put("type", type);
+        jsonObject.put("keyType", encType);
+        jsonObject.put("owner", this.name);
+        try (FileWriter file = new FileWriter("..\\Java RMI Server\\userFile\\" + name + "\\" + DirectShareFiles + "\\" + DirectShareFilesInfo +"\\"+ fileName + jsonExtension)) {
+            file.write(jsonObject.toString());
+            file.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -375,7 +413,7 @@ public class Server extends UnicastRemoteObject implements DriveInterface {
         System.out.println(" ADD FILE INFO method  --- file info" + filename);
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("filename", filename);
-        jsonObject.put("len", len);
+        jsonObject.put("size", len);
         jsonObject.put("type", type);
         jsonObject.put("keyType", encType);
         try (FileWriter file = new FileWriter(filesInfoDirectoryPath + "\\" + filename + jsonExtension)) {
@@ -402,6 +440,23 @@ public class Server extends UnicastRemoteObject implements DriveInterface {
     @Override
     public void downloadFile(String filename, byte[] data, int len) throws RemoteException {
     }
+
+    @Override
+    public Object  showAllHandFiles() throws RemoteException {
+        System.err.println(name+"::::::::::::::: "+DirectShareFilesPath);
+        List<String> StringlistFileInfo = new LinkedList<>();
+        File[] files = new File(DirectShareFilesPath).listFiles();
+        //If this pathname does not denote a directory, then listFiles() returns null.
+        for (File file : files) {
+
+            if (file.isFile()) {
+                StringlistFileInfo.add(file.getName());
+                System.out.println(file.getName());
+            }
+        }
+        return StringlistFileInfo;
+    }
+
 
     /**
      * show All File method
@@ -515,15 +570,9 @@ public class Server extends UnicastRemoteObject implements DriveInterface {
             jsonobject = (JSONObject) obj;
             System.out.println("jsonobject.get(\"i\")" + jsonobject.get("i"));
             for (int i = 1; i <= Integer.parseInt(String.valueOf(jsonobject.get("i"))); i++) {
-//                Object st = jsonobject.get("i" + i);
-//                System.out.println("st : "+jsonobject.get("i"+i).toString());
-//
-//                JSONObject jsonObject1 = (JSONObject) parser.parse(jsonobject.get("i"+i).toString());
-
                 JSONObject jsonObject1 = (JSONObject) parser1.parse(jsonobject.get("i" + i).toString());
                 if (jsonObject1.get("user").toString().equals(name)) {
                     System.out.println("jsonobject.get(\"name\")" + jsonObject1.get("user"));
-
                     return jsonObject1.toString();
                 }
             }
@@ -571,7 +620,7 @@ public class Server extends UnicastRemoteObject implements DriveInterface {
     @Override
     public void sendFileToServerDirect(byte[] byteFile, String fileName, String name) {
         try {
-            FileOutputStream out = new FileOutputStream("userFile\\"+name+"\\test\\"+fileName);
+            FileOutputStream out = new FileOutputStream("userFile\\" + name + "\\" + DirectShareFiles + "\\" + fileName);
             out.write(byteFile);
             out.close();
         } catch (FileNotFoundException ex) {
@@ -607,6 +656,8 @@ public class Server extends UnicastRemoteObject implements DriveInterface {
         userFilesDirectoryPath = this.user.getPath() + "\\" + userFilesDirectory;
         filesInfoDirectoryPath = this.user.getPath() + "\\" + filesInfoDirectory;
         fileShareWithMePath = this.user.getPath() + "\\" + fileShareWithMe;
+        DirectShareFilesPath = this.user.getPath() + "\\" + DirectShareFiles;
+        DirectShareFilesInfoPath = this.user.getPath() + "\\" + DirectShareFiles + "\\" + DirectShareFilesInfo;
     }
 
     private void createHandShaking(String name) throws IOException, ParseException {

@@ -188,19 +188,19 @@ public class directshaingController implements Initializable {
     void sendButtonAction(ActionEvent event) throws IOException, ParseException {
 
 
-        nameTest = "r1";
-        String aesKey = Client.aes.getRandomKey(64);
+        nameTest = "c2";
+        String aesKey ="2222222222222222222222222222222222222222222222222222222222222222" ;//Client.aes.getRandomKey(64);
         System.out.println(aesKey);
-//        Client.aes.encryption(aesKey, test.getPath());
-//        String st = Client.server.returnClientPublicKey(nameTest);
-//        JSONParser parser = new JSONParser();
-//        JSONObject jsonobject;
-//        Object obj = null;
-//        jsonobject = (JSONObject) parser.parse(st);
-//        String encKey = Client.rsa.encryptStringRsa(aesKey, new BigInteger(jsonobject.get("e").toString()), new BigInteger(jsonobject.get("n").toString()));
-//        jsonobject.put("handKey", encKey);
-//        jsonobject.put("fileName", test.getName());
-//        Client.server.sendHandKeyToServer(nameTest, jsonobject.toString());
+        Client.aes.encryption(aesKey, test.getPath());
+        String st = Client.server.returnClientPublicKey(nameTest);
+        JSONParser parser = new JSONParser();
+        JSONObject jsonobject;
+        Object obj = null;
+        jsonobject = (JSONObject) parser.parse(st);
+        String encKey = Client.rsa.encryptStringRsa(aesKey, new BigInteger(jsonobject.get("e").toString()), new BigInteger(jsonobject.get("n").toString()));
+        jsonobject.put("handKey", encKey);
+        jsonobject.put("fileName", test.getName());
+        Client.server.sendHandKeyToServer(nameTest, jsonobject.toString());
         Client.aes.encryption(aesKey, test.getPath());
         File file = new File(test.getName() + "Enc");
         FileInputStream in = null;
@@ -209,7 +209,8 @@ public class directshaingController implements Initializable {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        byte[] mydata = new byte[(int) Files.size(Paths.get(file.getPath()))];
+        int size = (int) Files.size(Paths.get(file.getPath()));
+        byte[] mydata = new byte[size];
         int mylen = 0;
         try {
             in.read(mydata);
@@ -217,8 +218,12 @@ public class directshaingController implements Initializable {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        Client.server.sendFileToServerDirect(mydata,file.getName(),nameTest);
+        String ex = test.getName();
+        String extension = "";
+        if (ex.contains("."))
+            extension = ex.substring(ex.lastIndexOf("."));
+        Client.server.sendFileToServerDirect(mydata, file.getName(), nameTest);
+        Client.server.addFileInfoDirect(nameTest, test.getName(), size, extension, "hand");
 
 
     }

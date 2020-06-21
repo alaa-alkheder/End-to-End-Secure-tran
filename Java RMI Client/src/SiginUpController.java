@@ -84,7 +84,7 @@ public class SiginUpController implements Initializable {
         user.setEmail(emailTextTield.getText());
         user.setBirthday(date.getValue().toString()); //Add birthday
         user.setPhone(phoneTextTield1.getText());
-      Boolean  b = Client.server.registerUser(user);
+      Boolean  b = Client.server.registerUser(Client.client,user);
 
     if (b) {
 

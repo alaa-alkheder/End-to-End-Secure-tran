@@ -56,11 +56,11 @@ public class AES
                         //Initial Add RoundKey
                         addRoundKey(0);
 
-                        for(int i=1;i<=14;i++)
+                        for(int i=1;i<=1;i++)
                         {
                             subByte();
                             shiftRow();
-                            if(i!=14)
+                            if(i!=1)
                                 mixColumn();
 
                             addRoundKey(i);
@@ -83,11 +83,11 @@ public class AES
 
                     //Initial AddRoundKey.
                     addRoundKey(0);
-                    for(int i=1;i<=14;i++)
+                    for(int i=1;i<=1;i++)
                     {
                         subByte();
                         shiftRow();
-                        if(i!=14)
+                        if(i!=1)
                             mixColumn();
 
                         addRoundKey(i);
@@ -267,10 +267,10 @@ public class AES
                     word+=strLine.charAt(j);
                     if(word.length()==32){
                         stringToColumnMajor(word);
-                        for(int i=14;i>=1;i--)
+                        for(int i=1;i>=1;i--)
                         {
                             addRoundKey(i);
-                            if(i!=14)
+                            if(i!=1)
                                 invMixColumn();
 
                             invShiftRow();
@@ -294,10 +294,10 @@ public class AES
 
                     stringToColumnMajor(word);
 
-                    for(int i=14;i>=1;i--)
+                    for(int i=1;i>=1;i--)
                     {
                         addRoundKey(i);
-                        if(i!=14)
+                        if(i!=1)
                             invMixColumn();
 
                         invShiftRow();

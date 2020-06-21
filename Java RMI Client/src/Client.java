@@ -36,7 +36,6 @@ public class Client extends UnicastRemoteObject implements DriveInterface, Runna
     static encRSA.RSA rsa = new encRSA.RSA();
     static AES aes = new AES();
     private static String privateKey = "";
-
     public static String getPrivateKey() {
         return privateKey;
     }
@@ -125,7 +124,7 @@ public class Client extends UnicastRemoteObject implements DriveInterface, Runna
 
 
     @Override
-    public Boolean registerUser(User user) throws RemoteException {
+    public Boolean registerUser(DriveInterface ci,User user) throws RemoteException {
 
         return false;
     }
@@ -151,7 +150,7 @@ public class Client extends UnicastRemoteObject implements DriveInterface, Runna
     }
 
     @Override
-    public void sendFileToClient(String FileName,int type) throws RemoteException {
+    public void sendFileToClient(String FileName,int type,int downloadType) throws RemoteException {
 
     }
 
@@ -213,6 +212,16 @@ public class Client extends UnicastRemoteObject implements DriveInterface, Runna
     @Override
     public boolean sendHandKeyToServer(String name, String file) throws RemoteException {
         return false;
+    }
+
+    @Override
+    public void addFileInfoDirect(String name, String fileNmae, int size, String type, String encType) throws RemoteException {
+
+    }
+
+    @Override
+    public Object showAllHandFiles() throws RemoteException {
+        return null;
     }
 
 
@@ -318,7 +327,7 @@ public class Client extends UnicastRemoteObject implements DriveInterface, Runna
         return true;
     }
 
-    public void run() {
+    public void run(){} /*{
         Scanner scanner = new Scanner(System.in);
         String clientName = "";
         String clientPassword = "";
@@ -416,6 +425,6 @@ public class Client extends UnicastRemoteObject implements DriveInterface, Runna
 //            System.out.println("\nClient Name or Password Incorrect...");
 //            System.out.println("\n");
         }
-    }
+    }*/
 
 }

@@ -30,6 +30,7 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -196,11 +197,16 @@ public class mainScreanController implements Initializable {
             jsonObject = (JSONObject) parser.parse(st);
             JSONObject jsonObject1;
             System.err.println(String.valueOf(jsonObject.get("n")));
+            LinkedList<String> o = new LinkedList<>();
             for (int i = 1; i <= Integer.parseInt(String.valueOf(jsonObject.get("n"))); i++) {
                 jsonObject1 = (JSONObject) parser.parse(jsonObject.get("file" + i).toString());
                 System.out.println(jsonObject1.get("fileName"));
-
-                addFileUploadToList((String) jsonObject1.get("fileName") + "Enc");
+                addFileUploadToList((String) jsonObject1.get("fileName") + "Enc", 2);
+            }
+            o = (LinkedList<String>) Client.server.showAllHandFiles();
+//            System.out.println(String.valueOf(Client.server.showAllHandFiles()));
+            for (int i = 0; i < o.size(); i++) {
+                addFileUploadToList((String) o.get(i) + "Enc", 2);
             }
         } catch (RemoteException | ParseException e) {
             e.printStackTrace();
@@ -298,7 +304,7 @@ public class mainScreanController implements Initializable {
             extension = path.substring(path.lastIndexOf("."));
         Client.server.addFileInfo(f1.getName(), fileSize, extension, "default");
 /** add file to list */
-        addFileUploadToList(f1.getName());
+        addFileUploadToList(f1.getName(), 1);
 
         try {
             in.close();
@@ -540,10 +546,7 @@ public class mainScreanController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
 
         try {
-//            System.out.println("****" + Client.rsa.getPublic_key().getE());
-//            System.out.println(Client.rsa.getPublic_key().getN());
             Client.server.sendPublicKeyToServer(Client.rsa.getPublic_key().getE(), Client.rsa.getPublic_key().getN());
-//            System.out.println(";;;;;;;"+Client.rsa.getPublic_key().getE()+"----"+Client.rsa.getPublic_key().getN());
         } catch (RemoteException e) {
             e.printStackTrace();
         }
@@ -552,14 +555,14 @@ public class mainScreanController implements Initializable {
 //        file tab controller
         /**   Error 1      */
         LinkedList<String> o = new LinkedList<>();
+
         try {
             o = (LinkedList<String>) Client.server.showAllFile();
         } catch (RemoteException e) {
             e.printStackTrace();
         }
-
         for (int i = 0; i < o.size(); i++) {
-            addFileUploadToList(String.valueOf(o.get(i)));
+            addFileUploadToList(String.valueOf(o.get(i)), 1);
         }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // user tab controller
@@ -839,11 +842,16 @@ public class mainScreanController implements Initializable {
 
     }
 
-    private void addFileUploadToList(String filename) {
+    String key = "";
+
+    private void addFileUploadToList(String filename, int typeFile) {
+        System.out.println("ttttttttt" + typeFile);
 
         filename = filename.substring(0, filename.length() - 3);
         Label label = null;
         try {
+
+
             label = new Label(filename);
             label.setStyle("-fx-font:normal bold 14px 'System';");
             label.setPrefWidth(150);
@@ -869,6 +877,7 @@ public class mainScreanController implements Initializable {
 
                 @Override
                 public void handle(javafx.scene.input.MouseEvent event) {
+
                     Parent root;
                     try {
                         root = FXMLLoader.load(getClass().getResource("fileinfo.fxml"));
@@ -902,6 +911,7 @@ public class mainScreanController implements Initializable {
 
             delete = new ImageView(new Image(new FileInputStream("../Java RMI Client/src/image/delete.png")));
 
+
         } catch (FileNotFoundException ex) {
             Logger.getLogger(mainScreanController.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -923,17 +933,29 @@ public class mainScreanController implements Initializable {
                         if (fileName.contains("."))
                             extension = fileName.substring(fileName.lastIndexOf("."));
                         System.out.println(fileName);
-                        String st = Client.server.downloadFileInfo(fileName);
+                        String st = Client.server.downloadFileInfo(fileName.substring(0, fileName.length() - 3));
                         parser = new JSONParser();
                         JSONParser parser1 = new JSONParser();
                         jsonObject = (JSONObject) parser.parse(st);
-                        String key;
+
                         switch (jsonObject.get("keyType").toString()) {
                             case "default": {
                                 key = Client.getPrivateKey();
                             }
                             break;
                             case "hand": {
+                                String path = fileName.substring(0,fileName.length()-3) + ".json";
+                                JSONParser parser = new JSONParser();
+                                JSONObject jsonobject = new JSONObject();
+                                try {
+                                    jsonobject = (JSONObject) parser.parse(new FileReader(path));
+                                } catch (IOException ex) {
+                                    ex.printStackTrace();
+                                } catch (ParseException ex) {
+                                    ex.printStackTrace();
+                                }
+                                key = Client.rsa.decryptStringRsa(jsonobject.get("handKey").toString());
+                                System.out.println("key" +key);
 //                                key = Client.getPrivateKey();
                             }
                             break;
@@ -945,16 +967,28 @@ public class mainScreanController implements Initializable {
 
 
                         if (shareRadioButton.isSelected()) {
-                            for (int i = 1; i <= Integer.parseInt(String.valueOf(jsonObject.get("n"))); i++) {
-                                JSONObject jsonObject1 = (JSONObject) parser.parse(jsonObject.get("file" + i).toString());
-                                if (fileName.equals(jsonObject1.get("fileName")))
-                                    Client.server.sendFileToClient((String) jsonObject1.get("path") + "Enc", 1);
+                            Label l1 = (Label) (hBox.getChildren().get(5));
+                            System.out.println();
+                            if (l1.getText().equals("0")) {//0 is share with me file without hand key
+                                for (int i = 1; i <= Integer.parseInt(String.valueOf(jsonObject.get("n"))); i++) {
+                                    JSONObject jsonObject1 = (JSONObject) parser.parse(jsonObject.get("file" + i).toString());
+                                    if (fileName.equals(jsonObject1.get("fileName")))
+                                        Client.server.sendFileToClient((String) jsonObject1.get("path") + "Enc", 1, 0);
+                                    Client.aes.decryption(Client.getPrivateKey(), fileName, fileName, "");
+
+                                }
+                            }
+                            if (l1.getText().equals("2")) {//1 is share with me file with hand key
+                                System.out.println("Fuck *****");
+                                Client.server.sendFileToClient(fileName, 0, 1);
+                                Client.aes.decryption(key, fileName, fileName, "");
                             }
                         } else {
-                            Client.server.sendFileToClient(fileName + "Enc", 0);
+                            Client.server.sendFileToClient(fileName + "Enc", 0, 0);
+                            Client.aes.decryption(Client.getPrivateKey(), fileName, fileName, "");
                         }
-                        Client.aes.decryption(Client.getPrivateKey(), fileName + "Enc", fileName, "");
-                        Files.delete(Paths.get(fileName + "Enc"));
+
+                        Files.deleteIfExists(Paths.get(fileName + "Enc"));
                     } catch (RemoteException e) {
                         e.printStackTrace();
                     } catch (IOException e) {
@@ -967,9 +1001,10 @@ public class mainScreanController implements Initializable {
         } catch (FileNotFoundException ex) {
             Logger.getLogger(mainScreanController.class.getName()).log(Level.SEVERE, null, ex);
         }
-
+        Label typeFileLabel = new Label();
+        typeFileLabel.setText(String.valueOf(typeFile));
         download.setCursor(Cursor.HAND);
-        hBox.getChildren().addAll(label, info, share, delete, download);
+        hBox.getChildren().addAll(label, info, share, delete, download, typeFileLabel);
         //add delete action in file tab
         share.setOnMouseClicked(new EventHandler<javafx.scene.input.MouseEvent>() {
 
@@ -1003,6 +1038,8 @@ public class mainScreanController implements Initializable {
 
             @Override
             public void handle(javafx.scene.input.MouseEvent event) {
+                Label ll = (Label) (hBox.getChildren().get(5));
+                System.out.println(ll.getText());
                 list.getItems().remove(hBox);
             }
         });

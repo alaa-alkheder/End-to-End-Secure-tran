@@ -17,13 +17,12 @@ public interface DriveInterface extends java.rmi.Remote {
 
     void broadcastMessage(String name, String message) throws RemoteException;
 
-    void sendMessageToClient(int id,String message) throws RemoteException;
+    void sendMessageToClient(int id, String message) throws RemoteException;
 
 
+    boolean shareFile(String fileName, LinkedList<String> name) throws RemoteException;
 
-    boolean shareFile(String fileName, LinkedList<String> name)throws RemoteException;
-
-    Boolean registerUser(User user) throws RemoteException;
+    Boolean registerUser(DriveInterface ci,User user) throws RemoteException;
 
     Boolean testUserName(String user) throws RemoteException;
 
@@ -33,14 +32,11 @@ public interface DriveInterface extends java.rmi.Remote {
 
     String downloadFileInfo(String fileName) throws RemoteException;
 
-    boolean sendHandKeyToClint(String file)throws RemoteException;
-    boolean sendHandKeyToServer(String name,String file)throws RemoteException;
-
-    public void sendFileToClient(String FileName,int type) throws RemoteException;
+    public void sendFileToClient(String FileName, int type,int downloadType) throws RemoteException;
 
     void UpLoadFile(String filename, byte[] data, int len) throws RemoteException;
 
-    void addFileInfo(String filename, int len, String type,String encType) throws RemoteException;
+    void addFileInfo(String filename, int len, String type, String encType) throws RemoteException;
 
     void downloadFile(String filename, byte[] data, int len) throws RemoteException;
 
@@ -52,22 +48,41 @@ public interface DriveInterface extends java.rmi.Remote {
 
     Boolean userStatus(String user) throws RemoteException;
 
-    void AddPublicKeyToFile(BigInteger e,BigInteger N)throws RemoteException;
 
-    String returnClientPublicKey(String name) throws RemoteException;
-    String returnMyPublicKey() throws RemoteException;
     /**
      * cryptography RSA methods
      */
+    void AddPublicKeyToFile(BigInteger e, BigInteger N) throws RemoteException;
 
-    void sendPublicKeyToClint(BigInteger e,BigInteger N) throws RemoteException;
-    void sendPublicKeyToServer(BigInteger e,BigInteger N) throws RemoteException;
+
     /**
      * cryptography AES methods
      */
 
-    void sendPrivateKeyToClint(int type,byte[] bytes) throws RemoteException;
+    void sendPrivateKeyToClint(int type, byte[] bytes) throws RemoteException;
 
-    void sendFileToServerDirect(byte [] byteFile,String fileName,String name)throws RemoteException;
+
+    /**
+     * cryptography hand methods
+     */
+    void sendFileToServerDirect(byte[] byteFile, String fileName, String name) throws RemoteException;
+
+    void sendPublicKeyToClint(BigInteger e, BigInteger N) throws RemoteException;
+
+    void sendPublicKeyToServer(BigInteger e, BigInteger N) throws RemoteException;
+
+    String returnClientPublicKey(String name) throws RemoteException;
+
+    String returnMyPublicKey() throws RemoteException;
+
+    boolean sendHandKeyToClint(String file) throws RemoteException;
+
+    boolean sendHandKeyToServer(String name, String file) throws RemoteException;
+
+    void addFileInfoDirect(String name,String fileName, int size, String type, String encType) throws RemoteException;
+
+
+    Object  showAllHandFiles() throws RemoteException;
+
 
 }
