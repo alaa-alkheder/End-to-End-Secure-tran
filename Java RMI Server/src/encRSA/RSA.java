@@ -4,7 +4,6 @@ import java.io.*;
 import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Base64;
 import java.util.Random;
 
 public class RSA {
@@ -16,22 +15,16 @@ public class RSA {
     private BigInteger d;
     private int bitlength = 512;
     private Random r;
-    static private int blocksize = 128;//block size =bit length/4
-    private publicKey public_key;
     byte n[];
+    static private int blocksize = 128;
 
-
-    /**
-     *
-     * @return
-     */
     public publicKey getPublic_key() {
         return public_key;
     }
 
-    /**
-     * default constrictor
-     */
+    private publicKey public_key;
+
+
     public RSA() {
         r = new Random();
         p = BigInteger.probablePrime(bitlength, r);
@@ -46,23 +39,21 @@ public class RSA {
         public_key = new publicKey(this.e, this.N);
 
     }
-    /**
-     * values constrictor
-     */
+
     public RSA(BigInteger e, BigInteger d, BigInteger N) {
         this.e = e;
         this.d = d;
         this.N = N;
     }
-//not important
-    /*private static String bytesToString(byte[] encrypted) {
+
+    private static String bytesToString(byte[] encrypted) {
         String test = "";
         for (byte b : encrypted) {
             test += Byte.toString(b);
         }
         System.out.println(test);
         return test;
-    }*/
+    }
 
     // Encrypt message
     private byte[] encrypt(byte[] message, publicKey public_key) {
@@ -78,11 +69,13 @@ public class RSA {
 
     private static void writeBytesToFile(byte[] bFile, String fileDest, int len) throws IOException {
         FileOutputStream fileOuputStream = null;
-        try {//append is true because every time we add block to file
+        try {
             fileOuputStream = new FileOutputStream(fileDest, true);
-            //len is a offset
+            System.out.println(len);
+            System.err.println(bFile.length);
             if (len < 1) return;
             fileOuputStream.write(bFile, 0, len);
+
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -91,19 +84,19 @@ public class RSA {
     }
 
     public void encryptrsa(String path, publicKey public_key) throws IOException {
-        //convert file to string
         base64.ecryptTo64(path);
-        blockList s = new blockList(); //to save the blocks of file after encryption
-        byte[] mydata = new byte[blocksize];//block size id 128 bit
+//        File f = new File(path);
+        blockList s = new blockList();
+        byte[] mydata = new byte[blocksize];
         FileInputStream in = null;
         int mylen = 0;
         try {
-            //temp file has data after convert to string in base64
             in = new FileInputStream("temp.txt");
             mylen = in.read(mydata);
             byte[] encrypted = encrypt(mydata, public_key);
-            s.ss.addLast(new byteblock(encrypted, mylen));//add the encrypted block
-            while (mylen > 0) {//repeat for all file
+            s.ss.addLast(new byteblock(encrypted, mylen));
+
+            while (mylen > 0) {
                 mylen = in.read(mydata);
                 encrypted = encrypt(mydata, public_key);
                 s.ss.addLast(new byteblock(encrypted, mylen));
@@ -117,7 +110,6 @@ public class RSA {
         }
 
         try {
-            //delete base64 temp after we use
             Files.deleteIfExists(Paths.get("temp.txt"));
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -127,54 +119,25 @@ public class RSA {
     }
 
     public void deccryptrsa(String pathFileToDecrypt, String fileName, String filePath) throws IOException, ClassNotFoundException {
-        pathFileToDecrypt = getfilename(pathFileToDecrypt) ;//get file name without extension
+        pathFileToDecrypt = getfilename(pathFileToDecrypt) ;
         blockList so = new blockList();
         ObjectInputStream oi = new ObjectInputStream(new FileInputStream(pathFileToDecrypt));
-        so = (blockList) oi.readObject();//read encrypted block list
-        for (int i = 0; i < so.ss.size(); i++) {//decrypt the list and save in file
+        so = (blockList) oi.readObject();
+        for (int i = 0; i < so.ss.size(); i++) {
             writeBytesToFile(decrypt(so.ss.get(i).bytes), "temp", (so.ss.get(i).lenth));
         }
         oi.close();
-        //convet file from string to file via base64
+
         base64.decryptVia64("temp", fileName + filePath);
         try {
-            //delete decrypt file
             Files.deleteIfExists(Paths.get("temp"));
         } catch (IOException ex) {
             ex.printStackTrace();
         }
+
+
     }
 
-
-
-    public String encryptStringRsa(String message, BigInteger e, BigInteger N) {
-        byte b[] = message.getBytes();
-        return Base64.getEncoder().encodeToString(encrypt(b, new publicKey(e, N)));
-    }
-
-    public String decryptStringRsa(String message) {
-
-        byte b[] = Base64.getDecoder().decode(message);
-        String temp = new String(decrypt(b));
-        return temp;
-    }
-
-    private byte[] decryptWithD(byte[] message, BigInteger N, BigInteger d) {
-        return (new BigInteger(message)).modPow(d, N).toByteArray();
-    }
-
-    public String decryptStringRsaWithD(String message, BigInteger N, BigInteger d) {
-        byte b[] = message.getBytes();
-        String temp = new String(decryptWithD(b, N, d));
-        return temp;
-    }
-
-
-    /**
-     * get file name without extension
-     * @param pathFile
-     * @return
-     */
     public static String getfilename(String pathFile) {
         int pos = pathFile.lastIndexOf(".");
         if (pos == -1)

@@ -77,7 +77,6 @@ public class SiginInController implements Initializable {
         }
         jsonobject = (JSONObject) obj;
         if (Client.server.checkClientCredintials(Client.client, jsonobject.get("name").toString(),jsonobject.get("password").toString() )) {
-            Client.ClientName=jsonobject.get("name").toString();
             Parent root1 = FXMLLoader.load(getClass().getResource("mainScrean.fxml"));
             Stage stage1 = new Stage();
             Scene scene1 = new Scene(root1);

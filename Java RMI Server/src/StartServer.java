@@ -229,8 +229,8 @@ public class StartServer {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         Naming.rebind("RMIServer", new Server());
+
     }
 
 

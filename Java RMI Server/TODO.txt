@@ -4,4 +4,3 @@
 4-create a subject and description when we send file
 5-pressure a group of file via zip algo.# is finished
 6- add google analytics to analyze the data (activeUser,users,feedBack,typeFile,usages via{today ,yesterday ,last week ,last year})
-7-convert AES -RSA to threads

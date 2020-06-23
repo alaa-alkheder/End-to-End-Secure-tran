@@ -14,7 +14,7 @@ public class base64 {
     public static String ecryptTo64(String path) throws IOException {
 
         File file = new File(path);
-        String dist = "temp.txt";//file after encrypt base 64
+        String dist = "temp.txt";
         String encodedfile = null;
         FileInputStream fileInputStreamReader = new FileInputStream(file);
         byte[] bytes = new byte[(int) file.length()];
@@ -29,8 +29,8 @@ public class base64 {
 
     public static String decryptVia64(String path, String dist) throws IOException {
 
-        BufferedReader bufferedReader = new BufferedReader(new FileReader(path));
-        String encodedfile = bufferedReader.readLine();
+        BufferedReader bufferedReader=new BufferedReader(new FileReader(path));
+     String encodedfile=bufferedReader.readLine();
         byte[] actualByte = Base64.getDecoder()
                 .decode(encodedfile);
         FileOutputStream fOut = new FileOutputStream(dist);
@@ -40,12 +40,11 @@ public class base64 {
         System.out.println("Done ");
         return dist;
     }
-
-    public static String getfilename(String pathFile) {
+    public static String getfilename(String pathFile){
         int pos = pathFile.lastIndexOf(".");
-        if (pos == -1)
+        if(pos == -1)
             return pathFile;
-        return pathFile.substring(0, pos);
+        return pathFile.substring(0,pos);
     }
 
 }
