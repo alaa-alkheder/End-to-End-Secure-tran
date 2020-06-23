@@ -105,7 +105,7 @@ public class addUserController implements Initializable {
             Names.addLast(label.getText().toString());
         }
         try {
-            Client.server.shareFile(fileSharingName, Names);
+            Client.server.shareFile(fileSharingName, Names,Client.ClientName);
         } catch (RemoteException e) {
             e.printStackTrace();
         }
