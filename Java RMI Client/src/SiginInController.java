@@ -4,6 +4,7 @@
  * and open the template in the editor.
  */
 
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
@@ -52,7 +53,8 @@ public class SiginInController implements Initializable {
 
     @FXML
     private Label error;
-
+    @FXML
+    private Label userName;
     @FXML
     private Label registerLabel;
 
@@ -61,14 +63,14 @@ public class SiginInController implements Initializable {
 
 
 
-
+    JSONObject jsonobject ;
 
     @FXML
     void loginButtonAction(ActionEvent event) throws IOException {
 //
         String path = "config.json";
         JSONParser parser = new JSONParser();
-        JSONObject jsonobject = new JSONObject();
+
         Object obj = null;
         try {
             obj = parser.parse(new FileReader(path));
@@ -77,6 +79,7 @@ public class SiginInController implements Initializable {
         }
         jsonobject = (JSONObject) obj;
         if (Client.server.checkClientCredintials(Client.client, jsonobject.get("name").toString(),jsonobject.get("password").toString() )) {
+            Client.ClientName=jsonobject.get("name").toString();
             Parent root1 = FXMLLoader.load(getClass().getResource("mainScrean.fxml"));
             Stage stage1 = new Stage();
             Scene scene1 = new Scene(root1);
@@ -90,7 +93,21 @@ public class SiginInController implements Initializable {
     }
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // TODO
+        String path = "config.json";
+        JSONParser parser = new JSONParser();
+
+        Object obj = null;
+        try {
+            obj = parser.parse(new FileReader(path));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        jsonobject = (JSONObject) obj;
+        userName.setText( jsonobject.get("name").toString());
     }
 
     public void RegisterButtonAction(ActionEvent actionEvent) throws IOException {

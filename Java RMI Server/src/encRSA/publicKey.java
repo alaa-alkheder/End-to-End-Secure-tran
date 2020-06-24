@@ -9,7 +9,7 @@ public class publicKey implements Serializable {
 
     public publicKey(BigInteger e, BigInteger n) {
         this.e = e;
-        N = n;
+       this. N = n;
     }
 
     public BigInteger getE() {

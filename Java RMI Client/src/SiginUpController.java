@@ -102,7 +102,7 @@ public class SiginUpController implements Initializable {
             e.printStackTrace();
         }
 
-          Client.server.AddPublicKeyToFile(rsa.getPublic_key().getE(),rsa.getPublic_key().getN());
+          Client.server.AddPublicKeyToFile(rsa.getPublic_key().getE(),rsa.getPublic_key().getN(),Client.ClientName);
 
         Parent root1 = FXMLLoader.load(getClass().getResource("mainScrean.fxml"));
         Stage stage1 = new Stage();

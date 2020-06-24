@@ -1,5 +1,6 @@
-import com.sun.scenario.animation.shared.ClipInterpolator;
-import com.sun.xml.internal.fastinfoset.tools.FI_DOM_Or_XML_DOM_SAX_SAXEvent;
+//import com.sun.scenario.animation.shared.ClipInterpolator;
+//import com.sun.xml.internal.fastinfoset.tools.FI_DOM_Or_XML_DOM_SAX_SAXEvent;
+
 import encRSA.RSA;
 import encRSA.publicKey;
 import org.json.simple.JSONObject;
@@ -21,23 +22,24 @@ import java.util.*;
  * Github:alaa-alkheder
  */
 
-public class Server extends UnicastRemoteObject implements DriveInterface {
+public class Server extends UnicastRemoteObject implements DriveInterface, Runnable {
     /**
      * user files name
      */
     //this file for save a temp object when we receive a notification and the user is offline
-    public final String tempFile = "temp.json";
+    public String tempFile = "temp.json";
     // //this directory save the uploaded file in the server
-    public final String userFilesDirectory = "files";
+    public String userFilesDirectory = "files";
     // //this directory save the file  info in the server
-    public final String filesInfoDirectory = "fileInfo";
+    public String filesInfoDirectory = "fileInfo";
     //this file saves files path that have been shared with me
-    public final String fileShareWithMe = "fileShareWithMe.json";
+    public String fileShareWithMe = "fileShareWithMe.json";
     //this file saves files ...............
-    public final String DirectShareFiles = "DirectShareFiles";
-    public final String DirectShareFilesInfo = "DirectShareFilesInfo";
+    public String DirectShareFiles = "DirectShareFiles";
+
+    public String DirectShareFilesInfo = "DirectShareFilesInfo";
     //
-    public final String jsonExtension = ".json";
+    public String jsonExtension = ".json";
 
     /**
      * user files path
@@ -58,11 +60,11 @@ public class Server extends UnicastRemoteObject implements DriveInterface {
 
 
     //    private static final long serialVersionUID = 1L;
-    static private ArrayList<DriveInterface> clientList;
+//    static private ArrayList<DriveInterface> clientList;
     static HashMap<String, DriveInterface> userClient = new HashMap<String, DriveInterface>();
     private User user;
-    private String name;
-    DriveInterface userInterface;
+    private String myName;
+//    DriveInterface userInterface;
 
     /**
      * default constrictor
@@ -70,7 +72,7 @@ public class Server extends UnicastRemoteObject implements DriveInterface {
      * @throws RemoteException
      */
     protected Server() throws RemoteException {
-        clientList = new ArrayList<DriveInterface>();
+//        clientList = new ArrayList<DriveInterface>();
 
     }
 
@@ -85,36 +87,43 @@ public class Server extends UnicastRemoteObject implements DriveInterface {
      *                         1-if the user name and password are correct define the interface , save client data and return true.
      *                         2-return false otherwise
      */
-    public synchronized boolean checkClientCredintials(DriveInterface chatinterface, String clientname, String password) throws RemoteException {
-        System.out.println(chatinterface);
+    public boolean checkClientCredintials(DriveInterface chatinterface, String clientname, String password) throws RemoteException {
+//        System.out.println(chatinterface);
         if (StartServer.CheckUserPassword(clientname, password)) {
-            this.clientList.add(chatinterface);
-            userInterface = chatinterface;
-            name = clientname;
-            userClient.put(name, chatinterface);
+//            this.clientList.add(chatinterface);
+//            userInterface = chatinterface;
+
+
+            myName = clientname;
+            defineUserPath(StartServer.userProfile.get(myName));
+            userClient.put(myName, chatinterface);
             //send massage to test the connection =>for programmer delete in product version
             chatinterface.sendMessageToClient(0, "Test Connection ");
             defineUserPath(StartServer.userProfile.get(clientname));
             chatinterface.sendPublicKeyToClint(StartServer.rsa.getPublic_key().getE(), StartServer.rsa.getPublic_key().getN());
-            System.out.println(StartServer.rsa.getPublic_key().getE() + "----" + StartServer.rsa.getPublic_key().getN());
+//            System.out.println(StartServer.rsa.getPublic_key().getE() + "----" + StartServer.rsa.getPublic_key().getN());
+
+
             return true;//if you login done
         }
         return false;//if happen any problem
     }
 
-    public synchronized void broadcastMessage(String clientname, String message) throws RemoteException {
+    public void broadcastMessage(String clientname, String message) throws RemoteException {
 //        for (int i = 0; i < clientList.size(); i++) {
 //            clientList.get(i).sendMessageToClient(clientname.toUpperCase() + " : " + message);
 //        }
     }
 
     @Override
-    public synchronized void sendMessageToClient(int id, String message) throws RemoteException {
+    public void sendMessageToClient(int id, String message) throws RemoteException {
     }
 
     @Override
-    public boolean shareFile(String fileName, LinkedList<String> names) throws RemoteException {
+    public boolean shareFile(String fileName, LinkedList<String> names, String me) throws RemoteException {
 
+        myName = me;
+        defineUserPath(StartServer.userProfile.get(myName));
         System.out.println("File share");
         System.out.println(fileName);
         for (int i = 0; i < names.size(); i++) {
@@ -142,7 +151,7 @@ public class Server extends UnicastRemoteObject implements DriveInterface {
             JSONObject jsontemp = (JSONObject) obj1;
             JSONObject jo = new JSONObject();
             jo.put("fileName", fileName);
-            jo.put("from", name);
+            jo.put("from", myName);
             jo.put("type", (String) jsontemp.get("type"));
             System.out.println(jsontemp.get("len"));
             jo.put("len", jsontemp.get("len"));
@@ -170,7 +179,7 @@ public class Server extends UnicastRemoteObject implements DriveInterface {
                 try {
 
                     if (entry.getKey().toString() == temp)
-                        entry.getValue().sendMessageToClient(1, "your received file" + "from : " + name + " => File Name is : " + fileName);
+                        entry.getValue().sendMessageToClient(1, "your received file" + "from : " + myName + " => File Name is : " + fileName);
                     else { //!!!!!  save notification in temp file
                         System.out.println("user :" + entry.getKey().toString() + " is offline and received file " + fileName);
                     }
@@ -197,18 +206,18 @@ public class Server extends UnicastRemoteObject implements DriveInterface {
      * @throws RemoteException
      */
     @Override
-    public Boolean registerUser(DriveInterface chatinterface,User user) throws RemoteException {
+    public Boolean registerUser(DriveInterface chatinterface, User user) throws RemoteException {
         //check the user if exits
         if (StartServer.SearchUserName(user.getUniqueName()))
             return false;
         //make folder for new user
         String path1 = "userFile\\" + user.getUniqueName();
-        name = user.getUniqueName();
+        myName = user.getUniqueName();
         File f = new File(path1);
         boolean b = f.mkdir();
-        this.clientList.add(chatinterface);
-        userInterface = chatinterface;
-        userClient.put(name, chatinterface);
+//        this.clientList.add(chatinterface);
+
+        userClient.put(myName, chatinterface);
         //send massage to test the connection =>for programmer delete in product version
         chatinterface.sendMessageToClient(0, "Test Connection ");
         if (b) {
@@ -259,17 +268,24 @@ public class Server extends UnicastRemoteObject implements DriveInterface {
     }
 
 
-    public void sendFileToClient(String FileName, int type,int downloadType) throws RemoteException {
-        String path="";
-        if(downloadType == 0){//0 is share with me file without hand key
-              path = userFilesDirectoryPath + "\\" + FileName;
+    public void sendFileToClient(String FileName, int type, int downloadType,String me) throws RemoteException {
+        myName = me;
+        defineUserPath(StartServer.userProfile.get(myName));
+        String path = "";
+        if (type == 0) {//0 download my file
+            path = userFilesDirectoryPath + "\\" + FileName;
         }
-        System.err.println(FileName);
+        System.err.println("@@@@@" + FileName);
 
-        if (downloadType == 1) {//use when we click download in file share with me view
+        if (type == 1) {//use when we click download in file share with me view
 
-            path = DirectShareFilesPath+"\\"+FileName;
-            System.out.println("**************"+path);
+            path = DirectShareFilesPath + "\\" + FileName;
+            System.out.println("*****2*********" + path);
+        }
+        if (type == 3) {//use when we click download in file share with me view
+
+            path = FileName;
+            System.out.println("******3********" + path);
         }
         File f1 = new File(path);
         int fileSize = 0;
@@ -287,7 +303,7 @@ public class Server extends UnicastRemoteObject implements DriveInterface {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        byte[] mydata = new byte[1024 * 1024];
+        byte[] mydata = new byte[1024 * 1024];//MB
         int mylen = 0;
         try {
             mylen = in.read(mydata);
@@ -297,15 +313,21 @@ public class Server extends UnicastRemoteObject implements DriveInterface {
         }
         while (mylen > 0) {
             //timer for Upload
-            System.out.println("Done Upload File Input Stream ..." + --timer);
+            DriveInterface userInterface=userClient.get(me);
             userInterface.downloadFile(f1.getName(), mydata, mylen);
+            System.out.println("Done Upload File Input Stream ..." + --timer);
+
             try {
                 mylen = in.read(mydata);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-
+        try {
+            in.close();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
 
 
@@ -332,12 +354,15 @@ public class Server extends UnicastRemoteObject implements DriveInterface {
     }
 
     @Override
-    public String downloadFileInfo(String fileName) throws RemoteException {
+    public String downloadFileInfo(String fileName, String me) throws RemoteException {
+
+        myName = me;
+        defineUserPath(StartServer.userProfile.get(myName));
         JSONParser parser = new JSONParser();
         JSONObject jsonobject;
         Object obj = null;
         try {
-            obj = parser.parse(new FileReader(DirectShareFilesInfoPath + "\\" + fileName  + jsonExtension));
+            obj = parser.parse(new FileReader(DirectShareFilesInfoPath + "\\" + fileName + jsonExtension));
         } catch (IOException ex) {
             ex.printStackTrace();
         } catch (ParseException ex) {
@@ -357,7 +382,7 @@ public class Server extends UnicastRemoteObject implements DriveInterface {
         for (HashMap.Entry<String, DriveInterface> entry : userClient.entrySet()) {
             if (entry.getKey().equals(name)) {//the user is online
                 entry.getValue().sendHandKeyToClint(file);
-                System.out.println("user " + entry.getKey() + "is online");
+                System.out.println("user " + entry.getKey() + "is online and i'm " + myName);
             } else {//user is offline
 
             }
@@ -368,14 +393,17 @@ public class Server extends UnicastRemoteObject implements DriveInterface {
     }
 
     @Override
-    public void addFileInfoDirect(String name, String fileName, int size, String type, String encType) throws RemoteException {
+    public void addFileInfoDirect(String name, String fileName, int size, String type, String encType, String me) throws RemoteException {
+
+        myName = me;
+        defineUserPath(StartServer.userProfile.get(myName));
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("filename", fileName);
         jsonObject.put("size", size);
         jsonObject.put("type", type);
         jsonObject.put("keyType", encType);
-        jsonObject.put("owner", this.name);
-        try (FileWriter file = new FileWriter("..\\Java RMI Server\\userFile\\" + name + "\\" + DirectShareFiles + "\\" + DirectShareFilesInfo +"\\"+ fileName + jsonExtension)) {
+        jsonObject.put("owner", myName);
+        try (FileWriter file = new FileWriter("..\\Java RMI Server\\userFile\\" + name + "\\" + DirectShareFiles + "\\" + DirectShareFilesInfo + "\\" + fileName + jsonExtension)) {
             file.write(jsonObject.toString());
             file.flush();
         } catch (IOException e) {
@@ -383,13 +411,17 @@ public class Server extends UnicastRemoteObject implements DriveInterface {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        System.out.println("addFileInfoDirect my name " + myName + " recever " + name);
     }
 
 
     int i = 0;//test delete after the finish code
 
     @Override
-    public void UpLoadFile(String filename, byte[] data, int len) throws RemoteException {
+    public void UpLoadFile(String filename, byte[] data, int len, String me) throws RemoteException {
+
+        myName = me;
+        defineUserPath(StartServer.userProfile.get(myName));
         try {
             //!!!!check if the file uploaded use searchFile();
 
@@ -408,7 +440,10 @@ public class Server extends UnicastRemoteObject implements DriveInterface {
     }
 
     @Override
-    public void addFileInfo(String filename, int len, String type, String encType) throws RemoteException {
+    public void addFileInfo(String filename, int len, String type, String encType, String me) throws RemoteException {
+
+        myName = me;
+        defineUserPath(StartServer.userProfile.get(myName));
         //!!!!check if the file uploaded use searchFile();
         System.out.println(" ADD FILE INFO method  --- file info" + filename);
         JSONObject jsonObject = new JSONObject();
@@ -442,8 +477,11 @@ public class Server extends UnicastRemoteObject implements DriveInterface {
     }
 
     @Override
-    public Object  showAllHandFiles() throws RemoteException {
-        System.err.println(name+"::::::::::::::: "+DirectShareFilesPath);
+    public Object showAllHandFiles(String me) throws RemoteException {
+
+        myName = me;
+        defineUserPath(StartServer.userProfile.get(myName));
+        System.err.println(myName + "::::::::::::::: " + DirectShareFilesPath);
         List<String> StringlistFileInfo = new LinkedList<>();
         File[] files = new File(DirectShareFilesPath).listFiles();
         //If this pathname does not denote a directory, then listFiles() returns null.
@@ -465,7 +503,9 @@ public class Server extends UnicastRemoteObject implements DriveInterface {
      * @throws RemoteException
      */
     @Override
-    public Object showAllFile() throws RemoteException {
+    public Object showAllFile(String me) throws RemoteException {
+        myName = me;
+        defineUserPath(StartServer.userProfile.get(myName));
         List<String> StringlistFileInfo = new LinkedList<>();
         File[] files = new File(userFilesDirectoryPath).listFiles();
 //If this pathname does not denote a directory, then listFiles() returns null.
@@ -491,8 +531,9 @@ public class Server extends UnicastRemoteObject implements DriveInterface {
     }
 
     @Override
-    public String showAllFileShareWithMEInfo() throws RemoteException {
-
+    public String showAllFileShareWithMEInfo(String me) throws RemoteException {
+        myName = me;
+        defineUserPath(StartServer.userProfile.get(myName));
         JSONParser parser = new JSONParser();
         JSONObject jsonobject;
         Object obj = null;
@@ -518,7 +559,9 @@ public class Server extends UnicastRemoteObject implements DriveInterface {
     }
 
     @Override
-    public void AddPublicKeyToFile(BigInteger EE, BigInteger NN) throws RemoteException {
+    public void AddPublicKeyToFile(BigInteger EE, BigInteger NN, String me) throws RemoteException {
+        myName = me;
+        defineUserPath(StartServer.userProfile.get(myName));
         String path = "publicKey.json";
         JSONParser parser = new JSONParser();
         JSONObject jsonobject = new JSONObject();
@@ -534,7 +577,7 @@ public class Server extends UnicastRemoteObject implements DriveInterface {
         int i = Integer.parseInt(String.valueOf(jsonobject.get("i")));
         i++;
         JSONObject js = new JSONObject();
-        js.put("user", name);
+        js.put("user", myName);
         js.put("e", EE);
         js.put("n", NN);
         jsonobject.put("i" + i, js.toJSONString());
@@ -555,12 +598,10 @@ public class Server extends UnicastRemoteObject implements DriveInterface {
         for (Map.Entry<String, DriveInterface> entry : userClient.entrySet()) {
             if (name.equals(entry.getKey())) {
                 System.out.println(name + "*-**********" + entry.getKey());
-
-
                 return entry.getValue().returnMyPublicKey();
             }
         }     //user is offline
-        JSONParser parser = new JSONParser();
+       /* JSONParser parser = new JSONParser();
         JSONParser parser1 = new JSONParser();
         JSONObject jsonobject = new JSONObject();
         Object obj = null;
@@ -580,7 +621,7 @@ public class Server extends UnicastRemoteObject implements DriveInterface {
             e.printStackTrace();
         } catch (IOException ex) {
             ex.printStackTrace();
-        }
+        }*/
         return "";
     }
 
@@ -596,12 +637,16 @@ public class Server extends UnicastRemoteObject implements DriveInterface {
     }
 
     @Override
-    public void sendPublicKeyToServer(BigInteger e, BigInteger N) throws RemoteException {
+    public void sendPublicKeyToServer(BigInteger e, BigInteger N, String me) throws RemoteException {
+
+        myName = me;
+        defineUserPath(StartServer.userProfile.get(myName));
         this.e = e;
         this.N = N;
         try {
-            System.out.println("////" + e + "*****" + N);
+//            System.out.println("////" + e + "*****" + N);
             StartServer.rsa.encryptrsa("aesKey.txt", new publicKey(e, N));
+            DriveInterface userInterface=userClient.get(me);
             userInterface.sendPrivateKeyToClint(1, Files.readAllBytes(Paths.get("aesKeyEnc")));
 //            Files.delete(Paths.get("aesKeyEnc"));
 //            Files.delete(Paths.get("aesKey.txt"));
@@ -618,7 +663,10 @@ public class Server extends UnicastRemoteObject implements DriveInterface {
     }
 
     @Override
-    public void sendFileToServerDirect(byte[] byteFile, String fileName, String name) {
+    public void sendFileToServerDirect(byte[] byteFile, String fileName, String name, String me) {
+
+        myName = me;
+        defineUserPath(StartServer.userProfile.get(myName));
         try {
             FileOutputStream out = new FileOutputStream("userFile\\" + name + "\\" + DirectShareFiles + "\\" + fileName);
             out.write(byteFile);
@@ -629,6 +677,7 @@ public class Server extends UnicastRemoteObject implements DriveInterface {
             ex.printStackTrace();
         }
 
+        System.out.println("sendFileToServerDirect my name " + myName + "recever" + name);
     }
 
 
@@ -698,5 +747,10 @@ public class Server extends UnicastRemoteObject implements DriveInterface {
         while (sb.length() < length)
             sb.append(Integer.toHexString(rand.nextInt()));
         return sb.toString().substring(0, length);
+    }
+
+    @Override
+    public void run() {
+
     }
 }

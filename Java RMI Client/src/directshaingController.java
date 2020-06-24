@@ -186,9 +186,8 @@ public class directshaingController implements Initializable {
 
     @FXML
     void sendButtonAction(ActionEvent event) throws IOException, ParseException {
+        sendButton.getScene().getWindow().hide();
 
-
-        nameTest = "c2";
         String aesKey ="2222222222222222222222222222222222222222222222222222222222222222" ;//Client.aes.getRandomKey(64);
         System.out.println(aesKey);
         Client.aes.encryption(aesKey, test.getPath());
@@ -201,6 +200,7 @@ public class directshaingController implements Initializable {
         jsonobject.put("handKey", encKey);
         jsonobject.put("fileName", test.getName());
         Client.server.sendHandKeyToServer(nameTest, jsonobject.toString());
+        System.out.println("$$$$  "+jsonobject.toString());
         Client.aes.encryption(aesKey, test.getPath());
         File file = new File(test.getName() + "Enc");
         FileInputStream in = null;
@@ -222,8 +222,8 @@ public class directshaingController implements Initializable {
         String extension = "";
         if (ex.contains("."))
             extension = ex.substring(ex.lastIndexOf("."));
-        Client.server.sendFileToServerDirect(mydata, file.getName(), nameTest);
-        Client.server.addFileInfoDirect(nameTest, test.getName(), size, extension, "hand");
+        Client.server.sendFileToServerDirect(mydata, file.getName(), nameTest,Client.ClientName);
+        Client.server.addFileInfoDirect(nameTest, test.getName(), size, extension, "hand",Client.ClientName);
 
 
     }
@@ -290,6 +290,17 @@ public class directshaingController implements Initializable {
                     }
 
                 }
+            });
+            radioButton.setOnMouseClicked(new EventHandler<javafx.scene.input.MouseEvent>() {
+
+                @Override
+                public void handle(javafx.scene.input.MouseEvent event) {
+                    nameTest = ((Label) h.getChildren().get(0)).getText();
+                    System.out.println(nameTest);
+
+                }
+
+
             });
 
         }

@@ -24,7 +24,7 @@ public class Client extends UnicastRemoteObject implements DriveInterface, Runna
     private static final long serialVersionUID = 1L;
     static DriveInterface server;
     static Client client;
-    private String ClientName;
+    static String ClientName;
     boolean chkExit = true;
     boolean chkLog = false;
     /**
@@ -102,7 +102,7 @@ public class Client extends UnicastRemoteObject implements DriveInterface, Runna
         while (mylen > 0) {
             //timer for Upload
             System.out.println("Done Upload File Input Stream ..." + --timer);
-            server.UpLoadFile(f1.getName(), mydata, mylen);
+            server.UpLoadFile(f1.getName(), mydata, mylen,ClientName);
             try {
                 mylen = in.read(mydata);
             } catch (IOException e) {
@@ -112,13 +112,13 @@ public class Client extends UnicastRemoteObject implements DriveInterface, Runna
         String extension = "";
         if (path.contains("."))
             extension = path.substring(path.lastIndexOf("."));
-        server.addFileInfo(f1.getName(), fileSize, extension,"default");
+        server.addFileInfo(f1.getName(), fileSize, extension,"default",ClientName);
 
     }
 
 
     @Override
-    public boolean shareFile(String fileName, LinkedList<String> name) throws RemoteException {
+    public boolean shareFile(String fileName, LinkedList<String> name,String me) throws RemoteException {
         return false;
     }
 
@@ -145,28 +145,28 @@ public class Client extends UnicastRemoteObject implements DriveInterface, Runna
     }
 
     @Override
-    public String downloadFileInfo(String fileName) throws RemoteException {
+    public String downloadFileInfo(String fileName,String me) throws RemoteException {
         return "";
     }
 
     @Override
-    public void sendFileToClient(String FileName,int type,int downloadType) throws RemoteException {
+    public void sendFileToClient(String FileName,int type,int downloadType,String me) throws RemoteException {
 
     }
 
     @Override
-    public void addFileInfo(String filename, int len, String type,String encType) throws RemoteException {
+    public void addFileInfo(String filename, int len, String type,String encType,String me) throws RemoteException {
 
     }
 
     @Override
-    public void UpLoadFile(String filename, byte[] data, int len) throws RemoteException {
+    public void UpLoadFile(String filename, byte[] data, int len,String me) throws RemoteException {
 
     }
 
     @Override
-    public void downloadFile(String filename, byte[] data, int len) throws RemoteException {
-        System.out.println("DDDDDDDDDD");
+    public void downloadFile(String filename, byte[] data, int len ) throws RemoteException {
+        System.out.println("DDDDDDDDDD"+filename);
         try {
 
             File f = new File(filename);
@@ -215,18 +215,18 @@ public class Client extends UnicastRemoteObject implements DriveInterface, Runna
     }
 
     @Override
-    public void addFileInfoDirect(String name, String fileNmae, int size, String type, String encType) throws RemoteException {
+    public void addFileInfoDirect(String name, String fileNmae, int size, String type, String encType,String me) throws RemoteException {
 
     }
 
     @Override
-    public Object showAllHandFiles() throws RemoteException {
+    public Object showAllHandFiles(String me) throws RemoteException {
         return null;
     }
 
 
     @Override
-    public Object showAllFile() throws RemoteException {
+    public Object showAllFile(String me) throws RemoteException {
         return null;
     }
 
@@ -236,7 +236,7 @@ public class Client extends UnicastRemoteObject implements DriveInterface, Runna
     }
 
     @Override
-    public String showAllFileShareWithMEInfo() throws RemoteException {
+    public String showAllFileShareWithMEInfo(String me) throws RemoteException {
         return null;
     }
 
@@ -246,7 +246,7 @@ public class Client extends UnicastRemoteObject implements DriveInterface, Runna
     }
 
     @Override
-    public void AddPublicKeyToFile(BigInteger e, BigInteger N) throws RemoteException {
+    public void AddPublicKeyToFile(BigInteger e, BigInteger N,String me) throws RemoteException {
 
     }
 
@@ -256,7 +256,7 @@ public class Client extends UnicastRemoteObject implements DriveInterface, Runna
     }
 
     @Override
-    public String returnMyPublicKey() throws RemoteException {
+    public String returnMyPublicKey( ) throws RemoteException {
         JSONObject jsonObject=new JSONObject();
         jsonObject.put("e",String.valueOf(rsa.getPublic_key().getE()));
         jsonObject.put("n",String.valueOf(rsa.getPublic_key().getN()));
@@ -273,7 +273,7 @@ public class Client extends UnicastRemoteObject implements DriveInterface, Runna
     }
 
     @Override
-    public void sendPublicKeyToServer(BigInteger e, BigInteger N) throws RemoteException {
+    public void sendPublicKeyToServer(BigInteger e, BigInteger N,String me) throws RemoteException {
 
     }
 
@@ -302,7 +302,7 @@ public class Client extends UnicastRemoteObject implements DriveInterface, Runna
     }
 
     @Override
-    public void sendFileToServerDirect(byte[] byteFile, String fileName, String name) {
+    public void sendFileToServerDirect(byte[] byteFile, String fileName, String name,String me) {
 
     }
 

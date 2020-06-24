@@ -168,7 +168,17 @@ public class mainScreanController implements Initializable {
 
     @FXML
     void UploadFilesRadiButtonAction(ActionEvent event) {
+        list.getItems().clear();
+        LinkedList<String> o = new LinkedList<>();
 
+        try {
+            o = (LinkedList<String>) Client.server.showAllFile(Client.ClientName);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+        for (int i = 0; i < o.size(); i++) {
+            addFileUploadToList(String.valueOf(o.get(i)), 1);
+        }
     }
 
     @FXML
@@ -191,7 +201,8 @@ public class mainScreanController implements Initializable {
     @FXML
     void shareRadioButtonAction(ActionEvent event) {
         try {
-            String st = Client.server.showAllFileShareWithMEInfo();
+            list.getItems().clear();
+            String st = Client.server.showAllFileShareWithMEInfo(Client.ClientName);
             parser = new JSONParser();
             JSONParser parser1 = new JSONParser();
             jsonObject = (JSONObject) parser.parse(st);
@@ -201,9 +212,9 @@ public class mainScreanController implements Initializable {
             for (int i = 1; i <= Integer.parseInt(String.valueOf(jsonObject.get("n"))); i++) {
                 jsonObject1 = (JSONObject) parser.parse(jsonObject.get("file" + i).toString());
                 System.out.println(jsonObject1.get("fileName"));
-                addFileUploadToList((String) jsonObject1.get("fileName") + "Enc", 2);
+                addFileUploadToList((String) jsonObject1.get("fileName") + "Enc", 0);
             }
-            o = (LinkedList<String>) Client.server.showAllHandFiles();
+            o = (LinkedList<String>) Client.server.showAllHandFiles(Client.ClientName);
 //            System.out.println(String.valueOf(Client.server.showAllHandFiles()));
             for (int i = 0; i < o.size(); i++) {
                 addFileUploadToList((String) o.get(i) + "Enc", 2);
@@ -281,7 +292,7 @@ public class mainScreanController implements Initializable {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        byte[] mydata = new byte[1024 * 1024];
+        byte[] mydata = new byte[1024 * 1024];//MB
         int mylen = 0;
         try {
             mylen = in.read(mydata);
@@ -292,7 +303,7 @@ public class mainScreanController implements Initializable {
         while (mylen > 0) {
             //timer for Upload
             System.out.println("Done Upload File Input Stream ..." + --timer);
-            Client.server.UpLoadFile(f1.getName(), mydata, mylen);
+            Client.server.UpLoadFile(f1.getName(), mydata, mylen,Client.ClientName);
             try {
                 mylen = in.read(mydata);
             } catch (IOException e) {
@@ -302,7 +313,7 @@ public class mainScreanController implements Initializable {
         String extension = "";
         if (path.contains("."))
             extension = path.substring(path.lastIndexOf("."));
-        Client.server.addFileInfo(f1.getName(), fileSize, extension, "default");
+        Client.server.addFileInfo(f1.getName(), fileSize, extension, "default",Client.ClientName);
 /** add file to list */
         addFileUploadToList(f1.getName(), 1);
 
@@ -546,7 +557,7 @@ public class mainScreanController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
 
         try {
-            Client.server.sendPublicKeyToServer(Client.rsa.getPublic_key().getE(), Client.rsa.getPublic_key().getN());
+            Client.server.sendPublicKeyToServer(Client.rsa.getPublic_key().getE(), Client.rsa.getPublic_key().getN(),Client.ClientName);
         } catch (RemoteException e) {
             e.printStackTrace();
         }
@@ -557,7 +568,7 @@ public class mainScreanController implements Initializable {
         LinkedList<String> o = new LinkedList<>();
 
         try {
-            o = (LinkedList<String>) Client.server.showAllFile();
+            o = (LinkedList<String>) Client.server.showAllFile(Client.ClientName);
         } catch (RemoteException e) {
             e.printStackTrace();
         }
@@ -928,8 +939,9 @@ public class mainScreanController implements Initializable {
                     Label ll = (Label) hBox.getChildren().get(0);
                     String fileName = ll.getText();//print file share name
 //                        System.out.println("++++"+fileName);
+                    key = Client.getPrivateKey();
                     try {
-                        String extension = "";
+                    /*    String extension = "";
                         if (fileName.contains("."))
                             extension = fileName.substring(fileName.lastIndexOf("."));
                         System.out.println(fileName);
@@ -944,6 +956,33 @@ public class mainScreanController implements Initializable {
                             }
                             break;
                             case "hand": {
+
+//                                key = Client.getPrivateKey();
+                            }
+                            break;
+                            case "old": {
+//                                key = Client.getPrivateKey();
+                            }
+                            break;
+                        }
+*/
+
+                        if (shareRadioButton.isSelected()) {
+                            Label l1 = (Label) (hBox.getChildren().get(5));
+                            System.out.println("@@@@@@@@@@");
+                            if (l1.getText().equals("0")) {//0 is share with me file without hand key
+                                for (int i = 1; i <= Integer.parseInt(String.valueOf(jsonObject.get("n"))); i++) {
+                                    JSONObject jsonObject1 = (JSONObject) parser.parse(jsonObject.get("file" + i).toString());
+                                    String uu= (String) jsonObject1.get("fileName");
+                                    if (fileName.equals(uu)) {
+                                        Client.server.sendFileToClient((String) jsonObject1.get("path") + "Enc", 3, 0, Client.ClientName);
+                                        System.out.println(fileName + "***" + uu + "***");
+                                        Client.aes.decryption(Client.getPrivateKey(), fileName + "Enc", fileName, "");
+                                    }
+                                }
+                            }
+                            if (l1.getText().equals("2")) {//1 is share with me file with hand key
+                                Client.server.sendFileToClient(fileName, 1, 1,Client.ClientName);
                                 String path = fileName.substring(0,fileName.length()-3) + ".json";
                                 JSONParser parser = new JSONParser();
                                 JSONObject jsonobject = new JSONObject();
@@ -954,38 +993,13 @@ public class mainScreanController implements Initializable {
                                 } catch (ParseException ex) {
                                     ex.printStackTrace();
                                 }
-                                key = Client.rsa.decryptStringRsa(jsonobject.get("handKey").toString());
+                                key = jsonobject.get("handKey").toString();
                                 System.out.println("key" +key);
-//                                key = Client.getPrivateKey();
+                                Client.aes.decryption(key, fileName, fileName.substring(0,fileName.length()-3), "");
                             }
-                            break;
-                            case "old": {
-//                                key = Client.getPrivateKey();
-                            }
-                            break;
-                        }
-
-
-                        if (shareRadioButton.isSelected()) {
-                            Label l1 = (Label) (hBox.getChildren().get(5));
-                            System.out.println();
-                            if (l1.getText().equals("0")) {//0 is share with me file without hand key
-                                for (int i = 1; i <= Integer.parseInt(String.valueOf(jsonObject.get("n"))); i++) {
-                                    JSONObject jsonObject1 = (JSONObject) parser.parse(jsonObject.get("file" + i).toString());
-                                    if (fileName.equals(jsonObject1.get("fileName")))
-                                        Client.server.sendFileToClient((String) jsonObject1.get("path") + "Enc", 1, 0);
-                                    Client.aes.decryption(Client.getPrivateKey(), fileName, fileName, "");
-
-                                }
-                            }
-                            if (l1.getText().equals("2")) {//1 is share with me file with hand key
-                                System.out.println("Fuck *****");
-                                Client.server.sendFileToClient(fileName, 0, 1);
-                                Client.aes.decryption(key, fileName, fileName, "");
-                            }
-                        } else {
-                            Client.server.sendFileToClient(fileName + "Enc", 0, 0);
-                            Client.aes.decryption(Client.getPrivateKey(), fileName, fileName, "");
+                        } else {//download my file
+                            Client.server.sendFileToClient(fileName + "Enc", 0, 0,Client.ClientName);
+                            Client.aes.decryption(Client.getPrivateKey(), fileName+"Enc", fileName, "");
                         }
 
                         Files.deleteIfExists(Paths.get(fileName + "Enc"));
