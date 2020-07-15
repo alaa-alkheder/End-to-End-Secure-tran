@@ -84,35 +84,44 @@ public class SiginUpController implements Initializable {
         user.setEmail(emailTextTield.getText());
         user.setBirthday(date.getValue().toString()); //Add birthday
         user.setPhone(phoneTextTield1.getText());
-      Boolean  b = Client.server.registerUser(Client.client,user);
+        Boolean b = Client.server.registerUser(Client.client, user);
 
-    if (b) {
+        if (b) {
+            Client.ClientName = user.getUniqueName();
+            encRSA.RSA rsa = new encRSA.RSA();
+            JSONObject jsonObject = new JSONObject();
+            JSONObject jsonObject1 = new JSONObject();
+            jsonObject.put("e", rsa.getPublic_key().getE());
+            jsonObject.put("n", rsa.getPublic_key().getN());
+            jsonObject.put("d", rsa.getD());
 
-         encRSA.RSA rsa = new encRSA.RSA();
-        JSONObject jsonObject=new JSONObject();
-        jsonObject.put("e",rsa.getPublic_key().getE());
-        jsonObject.put("n",rsa.getPublic_key().getN());
-        jsonObject.put("d",rsa.getD());
-          try (FileWriter file = new FileWriter("publicKey.json")) {
-            file.write(jsonObject.toString());
-            file.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+            jsonObject1.put("name", user.getUniqueName());
+            jsonObject1.put("password", user.getPassword());
+            try {
+                FileWriter file = new FileWriter("publicKey.json");
+                file.write(jsonObject.toString());
+                file.flush();
+                file.close();
+                FileWriter file1 = new FileWriter("config.json");
+                file1.write(jsonObject1.toString());
+                file1.flush();
+                file1.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
-          Client.server.AddPublicKeyToFile(rsa.getPublic_key().getE(),rsa.getPublic_key().getN(),Client.ClientName);
+            Client.server.AddPublicKeyToFile(rsa.getPublic_key().getE(), rsa.getPublic_key().getN(), Client.ClientName);
 
-        Parent root1 = FXMLLoader.load(getClass().getResource("mainScrean.fxml"));
-        Stage stage1 = new Stage();
-        Scene scene1 = new Scene(root1);
-        scene1.getStylesheets().add(getClass().getResource("ListViewStyle.css").toExternalForm());
-        stage1.setScene(scene1);
-        stage1.show();
-        submit.getScene().getWindow().hide();
-    }
-    else error.setText("The Account Is Already Exist");
+            Parent root1 = FXMLLoader.load(getClass().getResource("mainScrean.fxml"));
+            Stage stage1 = new Stage();
+            Scene scene1 = new Scene(root1);
+            scene1.getStylesheets().add(getClass().getResource("ListViewStyle.css").toExternalForm());
+            stage1.setScene(scene1);
+            stage1.show();
+            submit.getScene().getWindow().hide();
+        } else error.setText("The Account Is Already Exist");
     }
 
     @Override

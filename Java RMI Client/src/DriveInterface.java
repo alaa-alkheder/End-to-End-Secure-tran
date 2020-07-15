@@ -34,7 +34,7 @@ public interface DriveInterface extends java.rmi.Remote {
 
     public void sendFileToClient(String FileName, int type,int downloadType,String me) throws RemoteException;
 
-    void UpLoadFile(String filename, byte[] data, int len,String me) throws RemoteException;
+    void UpLoadFile(String filename, byte[] data, int len,String me,int type) throws RemoteException;
 
     void addFileInfo(String filename, int len, String type, String encType ,String me) throws RemoteException;
 
@@ -48,6 +48,7 @@ public interface DriveInterface extends java.rmi.Remote {
 
     Boolean userStatus(String user) throws RemoteException;
 
+    Boolean sendMassageChat(String receiver, String massage, String sender) throws RemoteException;
 
     /**
      * cryptography RSA methods

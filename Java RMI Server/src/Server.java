@@ -34,10 +34,14 @@ public class Server extends UnicastRemoteObject implements DriveInterface, Runna
     public String filesInfoDirectory = "fileInfo";
     //this file saves files path that have been shared with me
     public String fileShareWithMe = "fileShareWithMe.json";
+    //this file saves your work shop name
+    public String workShopFiles = "workShopFiles.json";
     //this file saves files ...............
     public String DirectShareFiles = "DirectShareFiles";
-
+    //
     public String DirectShareFilesInfo = "DirectShareFilesInfo";
+    //
+    public String workShop = "workShop";
     //
     public String jsonExtension = ".json";
 
@@ -50,6 +54,8 @@ public class Server extends UnicastRemoteObject implements DriveInterface, Runna
     public String fileShareWithMePath;
     public String DirectShareFilesPath;
     public String DirectShareFilesInfoPath;
+    public String workShopFilesPath;
+    public String workShopPath = workShop;
 
 
     /**
@@ -236,16 +242,20 @@ public class Server extends UnicastRemoteObject implements DriveInterface, Runna
         File Userfiles = new File(userFilesDirectoryPath);
         //
         File fileInfo = new File(filesInfoDirectoryPath);
-
+        //
         File fileDirectShare = new File(DirectShareFilesPath);
+        //
         File DirectShareFilesInfo = new File(DirectShareFilesInfoPath);
-//        //create new Files
+        //
+        File workShopFilesfile = new File(workShopFilesPath);
+        //create new Files
         try {
             tempfile.createNewFile();
             Userfiles.mkdir();
             fileInfo.mkdir();
             fileDirectShare.mkdir();
             DirectShareFilesInfo.mkdir();
+            workShopFilesfile.createNewFile();
             //
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("n", "0");
@@ -268,7 +278,7 @@ public class Server extends UnicastRemoteObject implements DriveInterface, Runna
     }
 
 
-    public void sendFileToClient(String FileName, int type, int downloadType,String me) throws RemoteException {
+    public void sendFileToClient(String FileName, int type, int downloadType, String me) throws RemoteException {
         myName = me;
         defineUserPath(StartServer.userProfile.get(myName));
         String path = "";
@@ -313,7 +323,7 @@ public class Server extends UnicastRemoteObject implements DriveInterface, Runna
         }
         while (mylen > 0) {
             //timer for Upload
-            DriveInterface userInterface=userClient.get(me);
+            DriveInterface userInterface = userClient.get(me);
             userInterface.downloadFile(f1.getName(), mydata, mylen);
             System.out.println("Done Upload File Input Stream ..." + --timer);
 
@@ -418,15 +428,18 @@ public class Server extends UnicastRemoteObject implements DriveInterface, Runna
     int i = 0;//test delete after the finish code
 
     @Override
-    public void UpLoadFile(String filename, byte[] data, int len, String me) throws RemoteException {
+    public void UpLoadFile(String filename, byte[] data, int len, String me,int type) throws RemoteException {
 
         myName = me;
         defineUserPath(StartServer.userProfile.get(myName));
         try {
             //!!!!check if the file uploaded use searchFile();
-
-            File f = new File(userFilesDirectoryPath + "\\" + filename);
-            f.createNewFile();
+            File f=new File("");
+            if (type==0)
+            {  f = new File(userFilesDirectoryPath + "\\" + filename);
+            f.createNewFile();}
+            if (type==1){  f = new File(workShopPath + "\\" + filename);
+                f.createNewFile();}
             FileOutputStream out = new FileOutputStream(f, true);
             out.write(data, 0, len);
             out.flush();
@@ -454,6 +467,7 @@ public class Server extends UnicastRemoteObject implements DriveInterface, Runna
         try (FileWriter file = new FileWriter(filesInfoDirectoryPath + "\\" + filename + jsonExtension)) {
             file.write(jsonObject.toString());
             file.flush();
+            file.close();
         } catch (IOException e) {
             e.printStackTrace();
         } catch (Exception e) {
@@ -552,11 +566,61 @@ public class Server extends UnicastRemoteObject implements DriveInterface, Runna
     @Override
     public Boolean userStatus(String user) throws RemoteException {
         for (Map.Entry<String, DriveInterface> entry : userClient.entrySet()) {
-            if (user.equals(entry.getKey())) ;
-            return true;
+            if (user.equals(entry.getKey()))
+                return true;
         }
         return false;
     }
+
+    @Override
+    public Boolean sendMassageChat(String receiver, String massage, String sender) throws RemoteException {
+        for (Map.Entry<String, DriveInterface> entry : userClient.entrySet()) {
+            if (user.equals(entry.getKey())) {//the user is online
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("sender", sender);
+                jsonObject.put("massage", massage);
+                entry.getValue().sendMessageToClient(2, jsonObject.toString());
+            }
+
+        }
+        //the user is offline
+//        !!!!!!!!!!save the massage in temp file
+        return null;
+    }
+    /**
+     * workShop method
+     */
+    @Override
+    public Boolean addWorkShop(String workShopName, String me) throws RemoteException {
+        try {
+            String path = workShopPath + "\\" + workShopName;
+            File file = new File(path);
+            file.mkdir();
+            File json = new File(path + "\\" + "info" + jsonExtension);
+            file.createNewFile();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        return true;
+    }
+
+
+
+    @Override
+    public Boolean removeFileToWorkShop(String fileName,String workShopName, String me) throws RemoteException {
+        return null;
+    }
+
+    @Override
+    public Boolean addUserToWorkShop(String user, String workShopName,String me) throws RemoteException {
+        return null;
+    }
+
+    @Override
+    public Boolean deleteWorkShop(String fileName, String me) throws RemoteException {
+        return null;
+    }
+
 
     @Override
     public void AddPublicKeyToFile(BigInteger EE, BigInteger NN, String me) throws RemoteException {
@@ -646,7 +710,7 @@ public class Server extends UnicastRemoteObject implements DriveInterface, Runna
         try {
 //            System.out.println("////" + e + "*****" + N);
             StartServer.rsa.encryptrsa("aesKey.txt", new publicKey(e, N));
-            DriveInterface userInterface=userClient.get(me);
+            DriveInterface userInterface = userClient.get(me);
             userInterface.sendPrivateKeyToClint(1, Files.readAllBytes(Paths.get("aesKeyEnc")));
 //            Files.delete(Paths.get("aesKeyEnc"));
 //            Files.delete(Paths.get("aesKey.txt"));
@@ -705,6 +769,7 @@ public class Server extends UnicastRemoteObject implements DriveInterface, Runna
         userFilesDirectoryPath = this.user.getPath() + "\\" + userFilesDirectory;
         filesInfoDirectoryPath = this.user.getPath() + "\\" + filesInfoDirectory;
         fileShareWithMePath = this.user.getPath() + "\\" + fileShareWithMe;
+        workShopFilesPath = this.user.getPath() + "\\" + workShopFiles;
         DirectShareFilesPath = this.user.getPath() + "\\" + DirectShareFiles;
         DirectShareFilesInfoPath = this.user.getPath() + "\\" + DirectShareFiles + "\\" + DirectShareFilesInfo;
     }

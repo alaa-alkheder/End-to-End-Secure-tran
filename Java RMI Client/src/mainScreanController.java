@@ -303,7 +303,7 @@ public class mainScreanController implements Initializable {
         while (mylen > 0) {
             //timer for Upload
             System.out.println("Done Upload File Input Stream ..." + --timer);
-            Client.server.UpLoadFile(f1.getName(), mydata, mylen,Client.ClientName);
+            Client.server.UpLoadFile(f1.getName(), mydata, mylen,Client.ClientName,0);
             try {
                 mylen = in.read(mydata);
             } catch (IOException e) {

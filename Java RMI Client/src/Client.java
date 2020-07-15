@@ -102,7 +102,7 @@ public class Client extends UnicastRemoteObject implements DriveInterface, Runna
         while (mylen > 0) {
             //timer for Upload
             System.out.println("Done Upload File Input Stream ..." + --timer);
-            server.UpLoadFile(f1.getName(), mydata, mylen,ClientName);
+            server.UpLoadFile(f1.getName(), mydata, mylen,ClientName,0);
             try {
                 mylen = in.read(mydata);
             } catch (IOException e) {
@@ -160,7 +160,7 @@ public class Client extends UnicastRemoteObject implements DriveInterface, Runna
     }
 
     @Override
-    public void UpLoadFile(String filename, byte[] data, int len,String me) throws RemoteException {
+    public void UpLoadFile(String filename, byte[] data, int len,String me,int type) throws RemoteException {
 
     }
 
@@ -242,6 +242,11 @@ public class Client extends UnicastRemoteObject implements DriveInterface, Runna
 
     @Override
     public Boolean userStatus(String user) throws RemoteException {
+        return null;
+    }
+
+    @Override
+    public Boolean sendMassageChat(String receiver, String massage, String sender) throws RemoteException {
         return null;
     }
 
