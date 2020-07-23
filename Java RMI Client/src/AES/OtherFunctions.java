@@ -17,7 +17,6 @@ public class OtherFunctions
 
     }
 
-
     //Rijndeal Multiplication
     public int rM(String s,int b1)
     {

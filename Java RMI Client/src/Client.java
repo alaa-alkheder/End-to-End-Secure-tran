@@ -36,10 +36,10 @@ public class Client extends UnicastRemoteObject implements DriveInterface, Runna
     static encRSA.RSA rsa = new encRSA.RSA();
     static AES aes = new AES();
     private static String privateKey = "";
+
     public static String getPrivateKey() {
         return privateKey;
     }
-
 
 
     protected Client(DriveInterface chatinterface) throws RemoteException {
@@ -102,7 +102,7 @@ public class Client extends UnicastRemoteObject implements DriveInterface, Runna
         while (mylen > 0) {
             //timer for Upload
             System.out.println("Done Upload File Input Stream ..." + --timer);
-            server.UpLoadFile(f1.getName(), mydata, mylen,ClientName,0);
+            server.UpLoadFile(f1.getName(), mydata, mylen, ClientName, 0);
             try {
                 mylen = in.read(mydata);
             } catch (IOException e) {
@@ -112,19 +112,19 @@ public class Client extends UnicastRemoteObject implements DriveInterface, Runna
         String extension = "";
         if (path.contains("."))
             extension = path.substring(path.lastIndexOf("."));
-        server.addFileInfo(f1.getName(), fileSize, extension,"default",ClientName);
+        server.addFileInfo(f1.getName(), fileSize, extension, "default", ClientName);
 
     }
 
 
     @Override
-    public boolean shareFile(String fileName, LinkedList<String> name,String me) throws RemoteException {
+    public boolean shareFile(String fileName, LinkedList<String> name, String me) throws RemoteException {
         return false;
     }
 
 
     @Override
-    public Boolean registerUser(DriveInterface ci,User user) throws RemoteException {
+    public Boolean registerUser(DriveInterface ci, User user) throws RemoteException {
 
         return false;
     }
@@ -145,28 +145,27 @@ public class Client extends UnicastRemoteObject implements DriveInterface, Runna
     }
 
     @Override
-    public String downloadFileInfo(String fileName,String me) throws RemoteException {
+    public String downloadFileInfo(String fileName, String me) throws RemoteException {
         return "";
     }
 
     @Override
-    public void sendFileToClient(String FileName,int type,int downloadType,String me) throws RemoteException {
+    public void sendFileToClient(String FileName, int type, int downloadType, String me) throws RemoteException {
 
     }
 
     @Override
-    public void addFileInfo(String filename, int len, String type,String encType,String me) throws RemoteException {
+    public void addFileInfo(String filename, int len, String type, String encType, String me) throws RemoteException {
 
     }
 
     @Override
-    public void UpLoadFile(String filename, byte[] data, int len,String me,int type) throws RemoteException {
+    public void UpLoadFile(String filename, byte[] data, int len, String me, int type) throws RemoteException {
 
     }
 
     @Override
-    public void downloadFile(String filename, byte[] data, int len ) throws RemoteException {
-        System.out.println("DDDDDDDDDD"+filename);
+    public void downloadFile(String filename, byte[] data, int len) throws RemoteException {
         try {
 
             File f = new File(filename);
@@ -194,10 +193,10 @@ public class Client extends UnicastRemoteObject implements DriveInterface, Runna
             ex.printStackTrace();
         }
         jsonobject = (JSONObject) obj;
-        if (String.valueOf(Client.rsa.getPublic_key().getE()).equals(jsonobject.get("e").toString())){
-            jsonobject.replace("handKey",Client.rsa.decryptStringRsa(jsonobject.get("handKey").toString()));
+        if (String.valueOf(Client.rsa.getPublic_key().getE()).equals(jsonobject.get("e").toString())) {
+            jsonobject.replace("handKey", Client.rsa.decryptStringRsa(jsonobject.get("handKey").toString()));
         }
-        try (FileWriter file1 = new FileWriter(jsonobject.get("fileName").toString()+".json")) {
+        try (FileWriter file1 = new FileWriter(jsonobject.get("fileName").toString() + ".json")) {
             file1.write(jsonobject.toString());
             file1.flush();
         } catch (IOException e) {
@@ -215,7 +214,7 @@ public class Client extends UnicastRemoteObject implements DriveInterface, Runna
     }
 
     @Override
-    public void addFileInfoDirect(String name, String fileNmae, int size, String type, String encType,String me) throws RemoteException {
+    public void addFileInfoDirect(String name, String fileNmae, int size, String type, String encType, String me) throws RemoteException {
 
     }
 
@@ -236,6 +235,16 @@ public class Client extends UnicastRemoteObject implements DriveInterface, Runna
     }
 
     @Override
+    public Object showAllWorkShop(String me) throws RemoteException {
+        return null;
+    }
+
+    @Override
+    public Object showFileInWorkShop(String workShopName) throws RemoteException {
+        return null;
+    }
+
+    @Override
     public String showAllFileShareWithMEInfo(String me) throws RemoteException {
         return null;
     }
@@ -251,7 +260,27 @@ public class Client extends UnicastRemoteObject implements DriveInterface, Runna
     }
 
     @Override
-    public void AddPublicKeyToFile(BigInteger e, BigInteger N,String me) throws RemoteException {
+    public Boolean addWorkShop(String workShopName, String me) throws RemoteException {
+        return null;
+    }
+
+    @Override
+    public Boolean removeFileToWorkShop(String fileName, String workShopName, String me) throws RemoteException {
+        return null;
+    }
+
+    @Override
+    public Boolean addUserToWorkShop(String user, String workShopName, String me) throws RemoteException {
+        return null;
+    }
+
+    @Override
+    public Boolean deleteWorkShop(String fileName, String me) throws RemoteException {
+        return null;
+    }
+
+    @Override
+    public void AddPublicKeyToFile(BigInteger e, BigInteger N, String me) throws RemoteException {
 
     }
 
@@ -261,14 +290,13 @@ public class Client extends UnicastRemoteObject implements DriveInterface, Runna
     }
 
     @Override
-    public String returnMyPublicKey( ) throws RemoteException {
-        JSONObject jsonObject=new JSONObject();
-        jsonObject.put("e",String.valueOf(rsa.getPublic_key().getE()));
-        jsonObject.put("n",String.valueOf(rsa.getPublic_key().getN()));
+    public String returnMyPublicKey() throws RemoteException {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("e", String.valueOf(rsa.getPublic_key().getE()));
+        jsonObject.put("n", String.valueOf(rsa.getPublic_key().getN()));
 
         return jsonObject.toString();
     }
-
 
 
     @Override
@@ -278,7 +306,7 @@ public class Client extends UnicastRemoteObject implements DriveInterface, Runna
     }
 
     @Override
-    public void sendPublicKeyToServer(BigInteger e, BigInteger N,String me) throws RemoteException {
+    public void sendPublicKeyToServer(BigInteger e, BigInteger N, String me) throws RemoteException {
 
     }
 
@@ -307,7 +335,7 @@ public class Client extends UnicastRemoteObject implements DriveInterface, Runna
     }
 
     @Override
-    public void sendFileToServerDirect(byte[] byteFile, String fileName, String name,String me) {
+    public void sendFileToServerDirect(byte[] byteFile, String fileName, String name, String me) {
 
     }
 
@@ -320,10 +348,19 @@ public class Client extends UnicastRemoteObject implements DriveInterface, Runna
             //test Connection
             case 0: {
                 System.out.println(message);
+                break;
             }
             //Send new File to User
             case 1: {
                 System.out.println(message);
+                break;
+            }
+            case 2: {
+                tempMassage.add(message);
+                System.out.println("@@@@@@ Case 2");
+                System.out.println("!!!!!!!!!!" + message);
+                break;
+
             }
         }
     }
@@ -332,7 +369,8 @@ public class Client extends UnicastRemoteObject implements DriveInterface, Runna
         return true;
     }
 
-    public void run(){} /*{
+    public void run() {
+    } /*{
         Scanner scanner = new Scanner(System.in);
         String clientName = "";
         String clientPassword = "";

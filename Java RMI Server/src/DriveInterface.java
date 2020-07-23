@@ -32,7 +32,7 @@ public interface DriveInterface extends java.rmi.Remote {
 
     String downloadFileInfo(String fileName, String me) throws RemoteException;
 
-    public void sendFileToClient(String FileName, int type, int downloadType, String me) throws RemoteException;
+     void sendFileToClient(String FileName, int type, int downloadType, String me) throws RemoteException;
 
     void UpLoadFile(String filename, byte[] data, int len, String me,int type) throws RemoteException;
 
@@ -43,6 +43,10 @@ public interface DriveInterface extends java.rmi.Remote {
     Object showAllFile(String me) throws RemoteException;
 
     Object showAllUser() throws RemoteException;
+
+    Object showAllWorkShop(String me) throws RemoteException;
+
+    Object showFileInWorkShop(String workShopName) throws RemoteException;
 
     String showAllFileShareWithMEInfo(String me) throws RemoteException;
 

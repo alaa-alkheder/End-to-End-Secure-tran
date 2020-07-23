@@ -247,7 +247,7 @@ public class Server extends UnicastRemoteObject implements DriveInterface, Runna
         //
         File DirectShareFilesInfo = new File(DirectShareFilesInfoPath);
         //
-        File workShopFilesfile = new File(workShopFilesPath);
+        File workShopFilesfile = new File(workShop + jsonExtension);
         //create new Files
         try {
             tempfile.createNewFile();
@@ -262,6 +262,9 @@ public class Server extends UnicastRemoteObject implements DriveInterface, Runna
             FileWriter file = new FileWriter(fileShareWithMePath);
             file.write(jsonObject.toString());
             file.flush();
+            FileWriter file1 = new FileWriter(workShopFilesfile);
+            file1.write(jsonObject.toString());
+            file1.flush();
 
             createHandShaking(user.getUniqueName());
         } catch (IOException ex) {
@@ -296,6 +299,9 @@ public class Server extends UnicastRemoteObject implements DriveInterface, Runna
 
             path = FileName;
             System.out.println("******3********" + path);
+        }
+        if (type==4){//download from work shop
+
         }
         File f1 = new File(path);
         int fileSize = 0;
@@ -428,18 +434,21 @@ public class Server extends UnicastRemoteObject implements DriveInterface, Runna
     int i = 0;//test delete after the finish code
 
     @Override
-    public void UpLoadFile(String filename, byte[] data, int len, String me,int type) throws RemoteException {
+    public void UpLoadFile(String filename, byte[] data, int len, String me, int type) throws RemoteException {
 
         myName = me;
         defineUserPath(StartServer.userProfile.get(myName));
         try {
             //!!!!check if the file uploaded use searchFile();
-            File f=new File("");
-            if (type==0)
-            {  f = new File(userFilesDirectoryPath + "\\" + filename);
-            f.createNewFile();}
-            if (type==1){  f = new File(workShopPath + "\\" + filename);
-                f.createNewFile();}
+            File f = new File("");
+            if (type == 0) {
+                f = new File(userFilesDirectoryPath + "\\" + filename);
+                f.createNewFile();
+            }
+            if (type == 1) {
+                f = new File(workShopPath + "\\" + filename);
+                f.createNewFile();
+            }
             FileOutputStream out = new FileOutputStream(f, true);
             out.write(data, 0, len);
             out.flush();
@@ -545,6 +554,48 @@ public class Server extends UnicastRemoteObject implements DriveInterface, Runna
     }
 
     @Override
+    public Object showAllWorkShop(String me) throws RemoteException {
+        myName = me;
+        defineUserPath(StartServer.userProfile.get(myName));
+        List<String> StringlistFileInfo = new LinkedList<>();
+        JSONParser parser = new JSONParser();
+        JSONObject jsonobject;
+        Object obj1 = null;
+        try {
+            obj1 = parser.parse(new FileReader("userFile\\" + me + "\\" + "info" + jsonExtension));
+            jsonobject = (JSONObject) obj1;
+            String n = ((String) jsonobject.get("n"));
+            int x = Integer.parseInt(n);
+            System.out.println("#######" + x);
+            for (int j = 1; j <= x; j++) {
+                StringlistFileInfo.add((String) jsonobject.get("workshop" + j));
+//                System.out.println("#######"+(String) jsonobject.get("workshop"+j));
+            }
+        } catch (Exception d) {
+            d.printStackTrace();
+        }
+
+        return StringlistFileInfo;
+    }
+
+    @Override
+    public Object showFileInWorkShop(String workShopName) throws RemoteException {
+        String path = workShopPath + "\\" + workShopName;
+        List<String> StringlistFileInfo = new LinkedList<>();
+        StringlistFileInfo.add("jjjjjjjjjjj");
+//        File[] files = new File(path).listFiles();
+////If this pathname does not denote a directory, then listFiles() returns null.
+//
+//        for (File file : files) {
+//            if (file.isFile()) {
+//                StringlistFileInfo.add(file.getName());
+//                System.out.println(file.getName());
+//            }
+//        }
+        return StringlistFileInfo;
+    }
+
+    @Override
     public String showAllFileShareWithMEInfo(String me) throws RemoteException {
         myName = me;
         defineUserPath(StartServer.userProfile.get(myName));
@@ -575,9 +626,10 @@ public class Server extends UnicastRemoteObject implements DriveInterface, Runna
     @Override
     public Boolean sendMassageChat(String receiver, String massage, String sender) throws RemoteException {
         for (Map.Entry<String, DriveInterface> entry : userClient.entrySet()) {
-            if (user.equals(entry.getKey())) {//the user is online
+            if (receiver.equals(entry.getKey())) {//the user is online
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put("sender", sender);
+                jsonObject.put("receiver", receiver);
                 jsonObject.put("massage", massage);
                 entry.getValue().sendMessageToClient(2, jsonObject.toString());
             }
@@ -587,6 +639,7 @@ public class Server extends UnicastRemoteObject implements DriveInterface, Runna
 //        !!!!!!!!!!save the massage in temp file
         return null;
     }
+
     /**
      * workShop method
      */
@@ -597,7 +650,12 @@ public class Server extends UnicastRemoteObject implements DriveInterface, Runna
             File file = new File(path);
             file.mkdir();
             File json = new File(path + "\\" + "info" + jsonExtension);
-            file.createNewFile();
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("n", "0");
+            json.createNewFile();
+            FileWriter fileWriter = new FileWriter(json);
+            fileWriter.write(jsonObject.toString());
+            fileWriter.close();
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -605,14 +663,52 @@ public class Server extends UnicastRemoteObject implements DriveInterface, Runna
     }
 
 
-
     @Override
-    public Boolean removeFileToWorkShop(String fileName,String workShopName, String me) throws RemoteException {
+    public Boolean removeFileToWorkShop(String fileName, String workShopName, String me) throws RemoteException {
         return null;
     }
 
     @Override
-    public Boolean addUserToWorkShop(String user, String workShopName,String me) throws RemoteException {
+    public Boolean addUserToWorkShop(String user, String workShopName, String me) throws RemoteException {
+        myName = me;
+        defineUserPath(StartServer.userProfile.get(user));
+        JSONParser parser = new JSONParser();
+        JSONObject jsonobject;
+
+        Object obj1 = null;
+        try {
+            obj1 = parser.parse(new FileReader("userFile\\" + user + "\\" + "info" + jsonExtension));
+            jsonobject = (JSONObject) obj1;
+            String n = ((String) jsonobject.get("n"));
+            int x = Integer.parseInt(n);
+            x++;
+            n = String.valueOf(x);
+            jsonobject.replace("n", n);
+            jsonobject.put("workshop" + x, workShopName);
+            FileWriter file = new FileWriter("userFile\\" + user + "\\" + "info" + jsonExtension);
+            file.write(jsonobject.toString());
+            file.flush();
+            file.close();
+
+            obj1 = parser.parse(new FileReader(workShopPath + "\\" + workShopName + "\\" + "info" + jsonExtension));
+            JSONObject jsonobject1 = (JSONObject) obj1;
+            n = ((String) jsonobject1.get("n"));
+            x = Integer.parseInt(n);
+            x++;
+            n = String.valueOf(x);
+            jsonobject1.replace("n", n);
+            jsonobject1.put("user" + x, user);
+            file = new FileWriter(workShopPath + "\\" + workShopName + "\\" + "info" + jsonExtension);
+            file.write(jsonobject1.toString());
+            file.flush();
+            file.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return null;
     }
 

@@ -19,9 +19,11 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.sun.org.apache.bcel.internal.generic.LASTORE;
 import encRSA.RSA;
 import encRSA.publicKey;
 import javafx.application.Platform;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -56,6 +58,7 @@ import javax.swing.*;
  * @author
  */
 public class mainScreanController implements Initializable {
+    public String contactName = "";
 
     @FXML
     private TabPane tabpane;
@@ -263,17 +266,7 @@ public class mainScreanController implements Initializable {
             System.out.println("we dont select any file");
             return;
         }
-//        try {
-//            Client.rsa.encryptrsa(path,new publicKey(Client.e,Client.N));
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//          String encPath= RSA.getfilename(path)+"Enc";
-// file encryption
         Client.aes.encryption(Client.getPrivateKey(), path);
-
-        //upload file
-//        File f1 = new File(path);
 
         File file = new File(path);
         File f1 = new File(file.getName() + "Enc");
@@ -303,7 +296,7 @@ public class mainScreanController implements Initializable {
         while (mylen > 0) {
             //timer for Upload
             System.out.println("Done Upload File Input Stream ..." + --timer);
-            Client.server.UpLoadFile(f1.getName(), mydata, mylen,Client.ClientName,0);
+            Client.server.UpLoadFile(f1.getName(), mydata, mylen, Client.ClientName, 0);
             try {
                 mylen = in.read(mydata);
             } catch (IOException e) {
@@ -313,7 +306,7 @@ public class mainScreanController implements Initializable {
         String extension = "";
         if (path.contains("."))
             extension = path.substring(path.lastIndexOf("."));
-        Client.server.addFileInfo(f1.getName(), fileSize, extension, "default",Client.ClientName);
+        Client.server.addFileInfo(f1.getName(), fileSize, extension, "default", Client.ClientName);
 /** add file to list */
         addFileUploadToList(f1.getName(), 1);
 
@@ -353,7 +346,7 @@ public class mainScreanController implements Initializable {
     private BorderPane borderPane;
 
     @FXML
-    private ListView<HBox> chatPaneList;
+    public ListView<HBox> chatPaneList;
 
     @FXML
     private TextArea messageTextArea;
@@ -458,6 +451,12 @@ public class mainScreanController implements Initializable {
             }
             box.setId("massage");
             Label massageLabel = new Label("" + messageTextArea.getText());
+            try {
+                Client.server.sendMassageChat(contactName, messageTextArea.getText(), Client.ClientName);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+            System.out.println("massage : " + messageTextArea.getText() + "contact Name :" + contactName);
             messageTextArea.setText("");
             // box.setPrefWidth(500.0);
             massageLabel.setWrapText(true);
@@ -471,6 +470,7 @@ public class mainScreanController implements Initializable {
             box.setFillHeight(true);
             box.setSpacing(10);
             box.setAlignment(Pos.CENTER_RIGHT);
+
             box.getChildren().addAll(massageLabel, timeLabel);
             chatPaneList.getItems().add(box);
             box.setPadding(new Insets(5, 5, 5, 5));
@@ -587,9 +587,18 @@ public class mainScreanController implements Initializable {
         for (int i = 0; i < user.size(); i++) addUserToList(user.get(i).getUniqueName());
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // workshop tab controller
-        for (int i = 0; i < 20; i++) addWorkshopToList("workshop" + i);
+        try {
+            List<String> workShopList = (List<String>) Client.server.showAllWorkShop(Client.ClientName);
+            for (int i = 0; i < workShopList.size(); i++) {
+                System.out.println("workShop NAme : " + workShopList.get(i));
+                addWorkshopToList(workShopList.get(i));
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+
 //        chat controller/////////////////////////////////////////////////////////////////////////////////
-        for (int i = 0; i < 20; i++) addUserToChatList("User" + i);
+        for (int i = 0; i < user.size(); i++) addUserToChatList(user.get(i).getUniqueName());
     }
 
 
@@ -613,7 +622,6 @@ public class mainScreanController implements Initializable {
         h.setPadding(new Insets(12, 10, 12, 10));
         h.setSpacing(50);
         ImageView info = null;
-
         try {
 
             info = new ImageView(new Image(new FileInputStream("../Java RMI Client/src/image/information.png")));
@@ -758,12 +766,24 @@ public class mainScreanController implements Initializable {
             public void handle(javafx.scene.input.MouseEvent event) {
                 Parent root;
                 try {
-                    root = FXMLLoader.load(getClass().getResource("userFileSharing.fxml"));
+                    FXMLLoader loader = new FXMLLoader();
+                    loader.setLocation(getClass().getResource("userFileSharing.fxml"));
+                    Parent s = loader.load();
+                    Scene scene = new Scene(s);
+                    addUserController controller = loader.getController();
+                    controller.workshopName = (String) ((Label) (hh.getChildren().get(0))).getText();
+
+                    System.out.println("tttt" + controller.workshopName);
                     Stage stage = new Stage();
-                    Scene scene = new Scene(root);
-                    scene.getStylesheets().add(getClass().getResource("ListViewStyle.css").toExternalForm());
                     stage.setScene(scene);
                     stage.show();
+//                    root = FXMLLoader.load(getClass().getResource("userFileSharing.fxml"));
+//                    hh
+//                    Stage stage = new Stage();
+//                    Scene scene = new Scene(root);
+//                    scene.getStylesheets().add(getClass().getResource("ListViewStyle.css").toExternalForm());
+//                    stage.setScene(scene);
+//                    stage.show();
 
                 } catch (IOException ex) {
                     Logger.getLogger(mainScreanController.class.getName()).log(Level.SEVERE, null, ex);
@@ -799,24 +819,32 @@ public class mainScreanController implements Initializable {
                     event.consume();
                     FXMLLoader loader = new FXMLLoader();
                     loader.setLocation(getClass().getResource("workshopInterface.fxml"));
+
                     Parent s = null;
                     try {
                         s = loader.load();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    Scene scene = new Scene(s);
-                    workshopController controller = loader.getController();
-                    System.out.println(controller);
-                    System.out.println(controller.workshopidLabel.getText());
-                    controller.workshopidLabel.setText("#222");
-                    Label ll = (Label) hh.getChildren().get(0);
-                    String workshopName = ll.getText();
-                    controller.workshopnameLabel.setText(workshopName);
+
+                        Scene scene = new Scene(s);
+                        workshopController controller = loader.getController();
+                        System.out.println(controller);
+                        System.out.println(controller.workshopidLabel.getText());
+                        controller.workshopidLabel.setText("#222");
+                        Label ll = (Label) hh.getChildren().get(0);
+                        String workshopName = ll.getText();
+                        controller.workshopnameLabel.setText(workshopName);
+                        List<String> LF = (List<String>) Client.server.showFileInWorkShop(workshopName);
+
+                        System.out.println("11111111"+LF.get(0));
+controller.getFileList(LF);
                     Stage stage = new Stage();
                     stage.setScene(scene);
                     stage.show();
-                }
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    }
             }
 
 
@@ -837,7 +865,7 @@ public class mainScreanController implements Initializable {
         }
 
         h.setPadding(new Insets(12, 10, 12, 10));
-        h.setSpacing(60);
+        h.setSpacing(40);
         userList.setStyle("-fx-font:normal bold 13px 'System';");
         h.setCursor(Cursor.DEFAULT);
         Label online = new Label("");
@@ -850,6 +878,17 @@ public class mainScreanController implements Initializable {
         h.getChildren().addAll(online, label);
         h.setAlignment(Pos.CENTER_LEFT);
         userList.getItems().add(h);
+        h.setOnMouseClicked(new EventHandler<javafx.scene.input.MouseEvent>() {
+
+            @Override
+            public void handle(javafx.scene.input.MouseEvent event) {
+                chatPaneList.getItems().clear();
+                Label dd = (Label) (h.getChildren().get(1));
+                contactName = (String) (dd.getText());
+                System.out.println("" + contactName);
+            }
+        });
+        ;
 
     }
 
@@ -973,7 +1012,7 @@ public class mainScreanController implements Initializable {
                             if (l1.getText().equals("0")) {//0 is share with me file without hand key
                                 for (int i = 1; i <= Integer.parseInt(String.valueOf(jsonObject.get("n"))); i++) {
                                     JSONObject jsonObject1 = (JSONObject) parser.parse(jsonObject.get("file" + i).toString());
-                                    String uu= (String) jsonObject1.get("fileName");
+                                    String uu = (String) jsonObject1.get("fileName");
                                     if (fileName.equals(uu)) {
                                         Client.server.sendFileToClient((String) jsonObject1.get("path") + "Enc", 3, 0, Client.ClientName);
                                         System.out.println(fileName + "***" + uu + "***");
@@ -982,8 +1021,8 @@ public class mainScreanController implements Initializable {
                                 }
                             }
                             if (l1.getText().equals("2")) {//1 is share with me file with hand key
-                                Client.server.sendFileToClient(fileName, 1, 1,Client.ClientName);
-                                String path = fileName.substring(0,fileName.length()-3) + ".json";
+                                Client.server.sendFileToClient(fileName, 1, 1, Client.ClientName);
+                                String path = fileName.substring(0, fileName.length() - 3) + ".json";
                                 JSONParser parser = new JSONParser();
                                 JSONObject jsonobject = new JSONObject();
                                 try {
@@ -994,12 +1033,12 @@ public class mainScreanController implements Initializable {
                                     ex.printStackTrace();
                                 }
                                 key = jsonobject.get("handKey").toString();
-                                System.out.println("key" +key);
-                                Client.aes.decryption(key, fileName, fileName.substring(0,fileName.length()-3), "");
+                                System.out.println("key" + key);
+                                Client.aes.decryption(key, fileName, fileName.substring(0, fileName.length() - 3), "");
                             }
                         } else {//download my file
-                            Client.server.sendFileToClient(fileName + "Enc", 0, 0,Client.ClientName);
-                            Client.aes.decryption(Client.getPrivateKey(), fileName+"Enc", fileName, "");
+                            Client.server.sendFileToClient(fileName + "Enc", 0, 0, Client.ClientName);
+                            Client.aes.decryption(Client.getPrivateKey(), fileName + "Enc", fileName, "");
                         }
 
                         Files.deleteIfExists(Paths.get(fileName + "Enc"));
@@ -1060,6 +1099,24 @@ public class mainScreanController implements Initializable {
         hBox.setAlignment(Pos.CENTER_LEFT);
         list.getItems().add(hBox);
 
+    }
+
+    public class chatView extends Thread{
+        @Override
+        public void run() {
+            while (true){
+                if (tempMassage.list.isEmpty()) {
+                    try {
+                        Thread.sleep(1000);
+
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                System.out.println(tempMassage.list.get(0));
+                tempMassage.list.remove(0);
+            }
+        }
     }
 
 }

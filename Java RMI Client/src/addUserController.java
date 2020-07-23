@@ -80,7 +80,7 @@ public class addUserController implements Initializable {
     @FXML
     private Button addButton;
 
-
+public String workshopName;
     @FXML
     void setAdminAction(ActionEvent event) {
         permission.setText("Admin");
@@ -95,20 +95,25 @@ public class addUserController implements Initializable {
 
     @FXML
     void addButtonAction(ActionEvent event) {
-        LinkedList<String> Names = new LinkedList<>();
+        System.out.println("++++++++++");
+        System.out.println("sss"+workshopName);
         addButton.getScene().getWindow().hide();
         for (int i = 0; i < list.size(); i++) {
             HBox bb = new HBox();
             bb = (HBox) list.get(i);
             Label label = new Label();
             label = (Label) bb.getChildren().get(0);
-            Names.addLast(label.getText().toString());
+//            label.getText().toString());
+
+            try {
+                Client.server.addUserToWorkShop(label.getText(),workshopName, Client.ClientName);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+
         }
-        try {
-            Client.server.shareFile(fileSharingName, Names,Client.ClientName);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
+
+
     }
 
     @FXML
@@ -214,6 +219,7 @@ public class addUserController implements Initializable {
             Label label = null;
             try {
                 label = new Label(u.get(i).getUniqueName());
+                label.setPrefWidth(150);
                 label.setStyle("-fx-font:normal bold 14px 'System';");
                 label.setGraphic(new ImageView(new Image(new FileInputStream("../Java RMI Client/src/image/user.png"))));
 
