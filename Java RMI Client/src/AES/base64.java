@@ -51,6 +51,7 @@ public class base64 {
             fOut.write(b);
             fOut.close();
             br.close();
+
         } catch (IOException e) {
             e.printStackTrace();
         }

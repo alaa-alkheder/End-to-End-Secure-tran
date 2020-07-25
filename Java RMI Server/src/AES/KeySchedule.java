@@ -1,10 +1,5 @@
 package AES;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
 
 public class KeySchedule {
 
@@ -12,44 +7,20 @@ public class KeySchedule {
     OtherFunctions of=new OtherFunctions();
     String expandedKey[][]=new String[4][60];
     String temp[][]=new String[4][1];
+    int Nk;
     public void keySchedule(String key)
     {
         try
         {
-            //reading key from file
-//            URL url = AES.class.getResource(keyfile);  //for relative path
-//            File file = new File(url.getPath());
-//            FileInputStream fstream = new FileInputStream(file);
-//            BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
-//            String strLine =  br.readLine();
-//            if(strLine.length()!=64)
-//            {
-//                System.out.println("Key length is not 256 bit. Program is terminating......");
-//                System.exit(0);
-//            }
-            // converting the stream of key into a matrix
+            // converting key into a matrix
             readKeyIntoMatrix(key);
-
-		/*Printing cipher key matrix
-		for(int i=0;i<4;i++)
-		{
-			for(int j=0;j<8;j++)
-			{
-				System.out.print(expandedKey[i][j]+" ");
-			}
-			System.out.println();
-		}
-		*/
 
             //expanding the key
             expandTheKey();
-
-//            br.close();
-        }//try closing here
+        }
 
         catch(Exception e)
         {
-            System.out.println("Exception in KeySchedule.");
             e.printStackTrace();
         }
 
@@ -57,8 +28,29 @@ public class KeySchedule {
 
     void readKeyIntoMatrix(String str)
     {
+        System.out.println(str.length());
+        switch (str.length()) {
+            // 128 bit key
+            case 64:
+            {
+                Nk = 8;
+                break;
+            }
+            // 192 bit key
+            case 48:
+                Nk = 6;
+                break;
+            // 256 bit key
+            case 32:
+                Nk = 4;
+                break;
+            default:
+                throw new IllegalArgumentException("It only supports 128, 192 and 256 bit keys!");
+        }
+
+
         int k=0;
-        for(int i=0;i<8;i++)
+        for(int i=0;i<Nk;i++)
         {
             for(int j=0;j<4;j++)
             {
@@ -71,35 +63,25 @@ public class KeySchedule {
     {
         try
         {
-            for(int i=8;i<60;i++)
+            for(int i=Nk;i<60;i++)
             {
-
                 //Assigning the W[i-1] to temp
                 temp[0][0]=expandedKey[0][i-1];
                 temp[1][0]=expandedKey[1][i-1];
                 temp[2][0]=expandedKey[2][i-1];
                 temp[3][0]=expandedKey[3][i-1];
 
-                //printTemp("After temp = w[i-1] \n");
-
-                if(i%8==0)
+                if(i%Nk==0)
                 {
                     rotWord();
-                    //printTemp("After rotWord "+i+"\n");
                     subWord();
-                    //printTemp("After subWord "+i+"\n");
-                    xorWithRcon((i/8)-1);
-                    //printTemp("After xorWithRcon "+i+" \n");
+                    xorWithRcon((i/Nk)-1);
                 }
 
-                if(i%8==4)
-                {
+                if(i%Nk==4)
                     subWord();
-                    //printTemp("After subWord "+i+"\n");
-                }
 
-                xorWithW(i-8);
-                //printTemp("After xorWithW "+i+" \n");
+                xorWithW(i-Nk);
 
                 expandedKey[0][i]=temp[0][0];
                 expandedKey[1][i]=temp[1][0];
@@ -112,7 +94,6 @@ public class KeySchedule {
             e.printStackTrace();
         }
 
-        //printKeyFull();
 
     }
 
@@ -137,10 +118,12 @@ public class KeySchedule {
     {
         String rCon[][] = new String[][]
                 {
-                        {"01","02","04","08","10","20","40"},
-                        {"00","00","00","00","00","00","00"},
-                        {"00","00","00","00","00","00","00"},
-                        {"00","00","00","00","00","00","00"},
+                        {"01","02","03","04","10","20","40","80","1B","36","6c","d8","ab","4d","9a"},
+                        {"01","02","03","04","10","20","40","80","1B","36","6c","d8","ab","4d","9a"},
+                        {"01","02","03","04","10","20","40","80","1B","36","6c","d8","ab","4d","9a"},
+                        {"01","02","03","04","10","20","40","80","1B","36","6c","d8","ab","4d","9a"},
+
+
                 };
 
         temp[0][0]=of.xorStringWithString(temp[0][0], rCon[0][i]);
@@ -155,12 +138,10 @@ public class KeySchedule {
         temp[1][0]=of.xorStringWithString(temp[1][0], expandedKey[1][i]);
         temp[2][0]=of.xorStringWithString(temp[2][0], expandedKey[2][i]);
         temp[3][0]=of.xorStringWithString(temp[3][0], expandedKey[3][i]);
-        //printTemp(" "+(i+8)+"---");
     }
 
     void printKeyFull()
     {
-        System.out.println("-----------printing key -----------------------");
         for(int i=0;i<4;i++)
         {
             for(int j=0;j<60;j++)
@@ -179,5 +160,3 @@ public class KeySchedule {
     }
 
 }
-
-

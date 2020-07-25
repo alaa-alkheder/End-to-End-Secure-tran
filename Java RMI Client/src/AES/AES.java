@@ -1,6 +1,8 @@
 package AES;
 
 
+import com.sun.org.apache.xpath.internal.objects.XNull;
+
 import java.io.*;
 import java.net.URL;
 import java.nio.file.Files;
@@ -45,6 +47,115 @@ public class AES
 
             while ((strLine = br.readLine()) != null)
             {
+                int stringLength = strLine.length();
+                String word="";
+                int j = 0;
+                for(j=0;j<stringLength;j++){
+                    word+=strLine.charAt(j);
+                    if(word.length()==32){
+                        //converting the line read into column major matrix i.e. state.
+                        stringToColumnMajor(word);
+
+                        //Initial Add RoundKey
+                        addRoundKey(0);
+
+                        for(int i=1;i<=1;i++)
+                        {
+                            subByte();
+                            shiftRow();
+                            if(i!=1)
+                                mixColumn();
+
+                            addRoundKey(i);
+                        }
+
+                        // Write Output To File
+                        String enc=columnMajorToString();
+                        writer.write(enc);
+                        word="";
+                    }
+                }
+
+                if(!word.equals("")){
+                    // Padding Zeros To 32 Char
+                    int k=32-(word.length()%32);
+                    for(int i=0;i<k;i++)
+                        word+="0";
+
+                    stringToColumnMajor(word);
+
+                    //Initial AddRoundKey.
+                    addRoundKey(0);
+                    for(int i=1;i<=1;i++)
+                    {
+                        subByte();
+                        shiftRow();
+                        if(i!=1)
+                            mixColumn();
+
+                        addRoundKey(i);
+                    }
+
+                    //W Write Output To File
+                    String enc=columnMajorToString();
+                    writer.write(enc);
+                }
+            }
+            writer.close();
+            br.close();
+        }
+
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        try {
+            Files.deleteIfExists(Paths.get("temphex"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+    }
+//Encryption function
+    //--------------------------------------------------------------------
+    public void partEncryption(String key, String inputFileName)
+    {
+        // Generate the key
+        ks.keySchedule(key);
+        try
+        {
+            new base64().convert2hex(inputFileName);
+            FileInputStream fstream = new FileInputStream("temphex");
+            BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
+            String strLine;
+
+            // Output File Name
+            File f=new File(inputFileName);
+            String outputFileName=  f.getName()+"Enc";;
+            PrintWriter writer=null;
+            try
+            {
+                writer = new PrintWriter(outputFileName, "UTF-8");
+            }
+            catch(Exception e)
+            {
+                e.printStackTrace();
+                System.out.println("Error in creating the new PrintWriter");
+            }
+
+
+            while ((strLine = br.readLine()) != null)
+            {
+
+                    for (int i = 0; i < 10; i++) {
+
+                        strLine = br.readLine();
+                        writer.write(strLine);
+                        if (strLine==null) return;
+                    }
+
                 int stringLength = strLine.length();
                 String word="";
                 int j = 0;

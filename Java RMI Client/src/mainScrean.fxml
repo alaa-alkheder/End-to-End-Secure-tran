@@ -14,7 +14,6 @@
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.effect.DropShadow?>
-
 <?import javafx.scene.effect.Lighting?>
 <?import javafx.scene.effect.Shadow?>
 <?import javafx.scene.image.Image?>
@@ -187,6 +186,17 @@
                         <DropShadow height="20.5" radius="9.625" width="20.0" />
                      </effect>
                   </Button>
+                  <RadioButton layoutX="548.0" layoutY="416.0" mnemonicParsing="false" text="Part Encryption" textFill="#743a9a">
+                     <toggleGroup>
+                        <ToggleGroup fx:id="Encription1" />
+                     </toggleGroup>
+                     <font>
+                        <Font name="System Bold" size="18.0" />
+                     </font>
+                     <effect>
+                        <DropShadow color="#c32f2f" />
+                     </effect>
+                  </RadioButton>
                     </children>
                     <opaqueInsets>
                         <Insets />

@@ -81,6 +81,7 @@ public class addUserController implements Initializable {
     private Button addButton;
 
 public String workshopName;
+
     @FXML
     void setAdminAction(ActionEvent event) {
         permission.setText("Admin");
@@ -91,8 +92,32 @@ public String workshopName;
         permission.setText("Admin");
     }
 
-    List list = new ArrayList();
+    List list = new ArrayList<>();
+    LinkedList<String> userList = new LinkedList<String>();
+    @FXML
+    private Button  shareButton ;
+    @FXML
+    void shareButtonAction (ActionEvent event) {
+        System.out.println("++++++++++");
+//        System.out.println("sss"+workshopName);
+        shareButton.getScene().getWindow().hide();
+        for (int i = 0; i < list.size(); i++) {
+            HBox bb = new HBox();
+            bb = (HBox) list.get(i);
+            Label label = new Label();
+            label = (Label) bb.getChildren().get(0);
+            userList.add(label.getText());
+//            System.out.println(label.getText());
+//            System.out.println("fileSharingName: "+fileSharingName);
 
+        }
+        try {
+            Client.server.shareFile(fileSharingName,userList,Client.ClientName);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+
+    }
     @FXML
     void addButtonAction(ActionEvent event) {
         System.out.println("++++++++++");

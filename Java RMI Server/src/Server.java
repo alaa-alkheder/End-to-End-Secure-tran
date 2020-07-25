@@ -9,6 +9,9 @@ import org.json.simple.parser.ParseException;
 
 import java.io.*;
 import java.math.BigInteger;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.rmi.RemoteException;
@@ -213,6 +216,16 @@ public class Server extends UnicastRemoteObject implements DriveInterface, Runna
      */
     @Override
     public Boolean registerUser(DriveInterface chatinterface, User user) throws RemoteException {
+        try {
+            URL url = new URL("http://localhost:8000/");
+            BufferedReader in = new BufferedReader(
+                    new InputStreamReader(url.openStream()));
+            in.close();
+        } catch (MalformedURLException ex) {
+//            ex.printStackTrace();
+        } catch (IOException ex) {
+//            ex.printStackTrace();
+        }
         //check the user if exits
         if (StartServer.SearchUserName(user.getUniqueName()))
             return false;
@@ -247,7 +260,7 @@ public class Server extends UnicastRemoteObject implements DriveInterface, Runna
         //
         File DirectShareFilesInfo = new File(DirectShareFilesInfoPath);
         //
-        File workShopFilesfile = new File(workShop + jsonExtension);
+        File workShopFilesfile = new File(workShopFilesPath);
         //create new Files
         try {
             tempfile.createNewFile();
@@ -300,8 +313,8 @@ public class Server extends UnicastRemoteObject implements DriveInterface, Runna
             path = FileName;
             System.out.println("******3********" + path);
         }
-        if (type==4){//download from work shop
-
+        if (type == 4) {//download from work shop
+            path = workShop + "\\" + FileName;
         }
         File f1 = new File(path);
         int fileSize = 0;
@@ -580,18 +593,19 @@ public class Server extends UnicastRemoteObject implements DriveInterface, Runna
 
     @Override
     public Object showFileInWorkShop(String workShopName) throws RemoteException {
-        String path = workShopPath + "\\" + workShopName;
+        String path = workShop + "\\" + workShopName;
         List<String> StringlistFileInfo = new LinkedList<>();
-        StringlistFileInfo.add("jjjjjjjjjjj");
-//        File[] files = new File(path).listFiles();
+//        StringlistFileInfo.add("jjjjjjjjjjj");
+        File[] files = new File(path).listFiles();
 ////If this pathname does not denote a directory, then listFiles() returns null.
-//
-//        for (File file : files) {
-//            if (file.isFile()) {
-//                StringlistFileInfo.add(file.getName());
-//                System.out.println(file.getName());
-//            }
-//        }
+
+        for (File file : files) {
+            if (file.isFile()) {
+                if (!file.getName().equals("info.json"))
+                    StringlistFileInfo.add(file.getName().substring(0, file.getName().length() - 3));
+                System.out.println(file.getName());
+            }
+        }
         return StringlistFileInfo;
     }
 
@@ -631,7 +645,9 @@ public class Server extends UnicastRemoteObject implements DriveInterface, Runna
                 jsonObject.put("sender", sender);
                 jsonObject.put("receiver", receiver);
                 jsonObject.put("massage", massage);
+                System.out.println(massage + " massssssssssssssssss");
                 entry.getValue().sendMessageToClient(2, jsonObject.toString());
+
             }
 
         }
@@ -865,7 +881,7 @@ public class Server extends UnicastRemoteObject implements DriveInterface, Runna
         userFilesDirectoryPath = this.user.getPath() + "\\" + userFilesDirectory;
         filesInfoDirectoryPath = this.user.getPath() + "\\" + filesInfoDirectory;
         fileShareWithMePath = this.user.getPath() + "\\" + fileShareWithMe;
-        workShopFilesPath = this.user.getPath() + "\\" + workShopFiles;
+        workShopFilesPath = this.user.getPath() + "\\" + "info.json";
         DirectShareFilesPath = this.user.getPath() + "\\" + DirectShareFiles;
         DirectShareFilesInfoPath = this.user.getPath() + "\\" + DirectShareFiles + "\\" + DirectShareFilesInfo;
     }

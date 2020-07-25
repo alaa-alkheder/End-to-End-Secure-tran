@@ -357,8 +357,8 @@ public class Client extends UnicastRemoteObject implements DriveInterface, Runna
             }
             case 2: {
                 tempMassage.add(message);
-                System.out.println("@@@@@@ Case 2");
-                System.out.println("!!!!!!!!!!" + message);
+                System.out.println("@@@@@@ Case 2 "+tempMassage.list.size());
+//                System.out.println("!!!!!!!!!!" + message);
                 break;
 
             }

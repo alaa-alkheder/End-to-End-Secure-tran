@@ -277,7 +277,7 @@ public void getFileList(List<String> f)
         Label label = null;
         try {
             label = new Label("" + file);
-            label.setPrefWidth(150);
+             label.setPrefWidth(150);
             label.setStyle("-fx-font:normal bold 14px 'System';");
             label.setGraphic(new ImageView(new Image(new FileInputStream("../Java RMI Client/src/image/approval.png"))));
 
@@ -311,10 +311,16 @@ public void getFileList(List<String> f)
                 public void handle(javafx.scene.input.MouseEvent event) {
                     Label ll = (Label) hBox.getChildren().get(0);
                     String fileName = ll.getText();//print file share name
-                        System.out.println(workshopnameLabel.getText()+"+++123456+"+fileName);
+                    String path= workshopnameLabel.getText()+"\\"+fileName+"Enc";
+                    try {
+                        Client.server.sendFileToClient(path,4,4,Client.ClientName);
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+                    System.out.println(workshopnameLabel.getText()+"+++123456+"+fileName);
 
                     try {
-
+                        Client.aes.decryption(Client.getPrivateKey(),fileName+"Enc",fileName,"");
 
                         Files.deleteIfExists(Paths.get(fileName + "Enc"));
                     } catch (RemoteException e) {

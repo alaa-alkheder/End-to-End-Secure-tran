@@ -58,6 +58,8 @@ import javax.swing.*;
  * @author
  */
 public class mainScreanController implements Initializable {
+    String AesKey="1111111111111111111111111111111111111111111111111111111111111111";
+    boolean partEnc=false;
     public String contactName = "";
 
     @FXML
@@ -233,23 +235,23 @@ public class mainScreanController implements Initializable {
 
     @FXML
     void AES128Action(ActionEvent event) {
-
+        AesKey="11111111111111111111111111111111";
     }
 
     @FXML
     void AES192Action(ActionEvent event) {
-
+        AesKey="111111111111111111111111111111111111111111";
     }
 
     @FXML
     void AES256Action(ActionEvent event) {
-
+AesKey="1111111111111111111111111111111111111111111111111111111111111111";
     }
 
 
     @FXML
     void RSAActon(ActionEvent event) {
-
+        AesKey="11111111111111111111111111111111";
     }
 
 
@@ -295,6 +297,7 @@ public class mainScreanController implements Initializable {
         }
         while (mylen > 0) {
             //timer for Upload
+
             System.out.println("Done Upload File Input Stream ..." + --timer);
             Client.server.UpLoadFile(f1.getName(), mydata, mylen, Client.ClientName, 0);
             try {
@@ -433,7 +436,9 @@ public class mainScreanController implements Initializable {
 
     @FXML
     void sendButtonAction(ActionEvent event) {
-        String massageTesxt = messageTextArea.getText();
+        String massageTesxt;
+
+        massageTesxt = messageTextArea.getText();
         String[] lines = massageTesxt.split("\n");
         int massageLine = lines.length;
         System.out.println("" + massageLine);
@@ -474,17 +479,16 @@ public class mainScreanController implements Initializable {
             box.getChildren().addAll(massageLabel, timeLabel);
             chatPaneList.getItems().add(box);
             box.setPadding(new Insets(5, 5, 5, 5));
-            receveButtonAction(event);
-//            if (chatPaneList.isHover()) {
-//Background.
-//            }
+
+
         }
 
     }
 
-    @FXML
-    void receveButtonAction(ActionEvent event) {
-        String massageTesxt = "helllllllllrecereceveButtonActionreceveButtonActionreceveButtonActionveButtonActionreceveButtonActionreceveButtonAction";
+    void receveMass(String mass) {
+//        chatPaneList.getItems().clear();
+        System.out.println("receveButtonAction() .mass : " + mass);
+        String massageTesxt = "" + mass;
         String[] lines = massageTesxt.split("\n");
         int massageLine = lines.length;
         System.out.println("" + massageLine);
@@ -516,10 +520,6 @@ public class mainScreanController implements Initializable {
             box.getChildren().addAll(timeLabel, massageLabel);
             chatPaneList.getItems().add(box);
             box.setPadding(new Insets(5, 5, 5, 5));
-
-//            if (chatPaneList.isHover()) {
-//Background.
-//            }
         }
 
     }
@@ -555,9 +555,9 @@ public class mainScreanController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-
+        chatView.start();
         try {
-            Client.server.sendPublicKeyToServer(Client.rsa.getPublic_key().getE(), Client.rsa.getPublic_key().getN(),Client.ClientName);
+            Client.server.sendPublicKeyToServer(Client.rsa.getPublic_key().getE(), Client.rsa.getPublic_key().getN(), Client.ClientName);
         } catch (RemoteException e) {
             e.printStackTrace();
         }
@@ -598,7 +598,8 @@ public class mainScreanController implements Initializable {
         }
 
 //        chat controller/////////////////////////////////////////////////////////////////////////////////
-        for (int i = 0; i < user.size(); i++) addUserToChatList(user.get(i).getUniqueName());
+        for (int i = 0; i < user.size(); i++)
+            addUserToChatList(user.get(i).getUniqueName());
     }
 
 
@@ -834,22 +835,24 @@ public class mainScreanController implements Initializable {
                         controller.workshopnameLabel.setText(workshopName);
                         List<String> LF = (List<String>) Client.server.showFileInWorkShop(workshopName);
 
-                        System.out.println("11111111"+LF.get(0));
-controller.getFileList(LF);
-                    Stage stage = new Stage();
-                    stage.setScene(scene);
-                    stage.show();
+                        System.out.println("11111111" + LF.get(0));
+                        controller.getFileList(LF);
+                        Stage stage = new Stage();
+                        stage.setScene(scene);
+                        stage.show();
                     } catch (RemoteException e) {
                         e.printStackTrace();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    }
+                }
             }
 
 
         });
     }
+
+    ChatView chatView = new ChatView();
 
     private void addUserToChatList(String user) {
         Label label = null;
@@ -865,10 +868,12 @@ controller.getFileList(LF);
         }
 
         h.setPadding(new Insets(12, 10, 12, 10));
-        h.setSpacing(40);
+        h.setSpacing(10);
         userList.setStyle("-fx-font:normal bold 13px 'System';");
         h.setCursor(Cursor.DEFAULT);
         Label online = new Label("");
+        online.setPrefWidth(60);
+        h.setPadding(new Insets(12, 10, 12, 50));
         try {
             online.setGraphic(new ImageView(new Image(new FileInputStream("../Java RMI Client/src/image/online.png"))));
         } catch (FileNotFoundException ex) {
@@ -879,10 +884,18 @@ controller.getFileList(LF);
         h.setAlignment(Pos.CENTER_LEFT);
         userList.getItems().add(h);
         h.setOnMouseClicked(new EventHandler<javafx.scene.input.MouseEvent>() {
-
+            //todo
             @Override
             public void handle(javafx.scene.input.MouseEvent event) {
                 chatPaneList.getItems().clear();
+//                List<String> listmas = chatView.listmas;
+//                System.out.println(listmas.size()+"listmas");
+//                if (chatView != null)
+//                for (int i = 0; i <chatView.listmas.size(); i++) {
+//                    System.out.println("chatView.listmas.size(" + chatView.listmas.size());
+//                    if(listmas.get(i).length()>0  )
+//                    receveButtonAction(listmas.get(i));
+//                }
                 Label dd = (Label) (h.getChildren().get(1));
                 contactName = (String) (dd.getText());
                 System.out.println("" + contactName);
@@ -1068,7 +1081,7 @@ controller.getFileList(LF);
 
                 System.out.println(fileName);
                 FXMLLoader loader = new FXMLLoader();
-                loader.setLocation(getClass().getResource("userFileSharing.fxml"));
+                loader.setLocation(getClass().getResource("addUsertoShare.fxml"));
                 Parent s = null;
                 try {
                     s = loader.load();
@@ -1101,20 +1114,51 @@ controller.getFileList(LF);
 
     }
 
-    public class chatView extends Thread{
-        @Override
-        public void run() {
-            while (true){
-                if (tempMassage.list.isEmpty()) {
-                    try {
-                        Thread.sleep(1000);
+    public class ChatView extends Thread {
+        public List<String> listmas = new ArrayList<>();
 
-                    } catch (InterruptedException e) {
+        @Override
+
+        public void run() {
+
+            while (true) {
+                if (!tempMassage.list.isEmpty()) {
+
+                    System.out.println("in thread list size is" + listmas.size());
+
+
+                    JSONParser parser = new JSONParser();
+                    JSONObject jsonObject = null;
+                    try {
+                        jsonObject = (JSONObject) parser.parse(tempMassage.list.get(0));
+                        String sender = (String) jsonObject.get("sender");
+                        String receiver = (String) jsonObject.get("receiver");
+                        String massage = (String) jsonObject.get("massage");
+                        System.out.println(contactName + "====" + receiver);
+                        if (!sender.equals(contactName)) {
+                            System.out.println("error");
+//                            chatPaneList.getItems().clear();
+                        } else if (sender.equals(contactName) && (massage.length() > 0)) {
+                            System.out.println("ok");
+                            // listmas.add(massage);
+                            javafx.application.Platform.runLater(()
+                                    -> receveMass(massage)
+                            );
+                            tempMassage.list.remove(0);
+                        }
+
+                    } catch (ParseException e) {
                         e.printStackTrace();
                     }
                 }
-                System.out.println(tempMassage.list.get(0));
-                tempMassage.list.remove(0);
+
+                try {
+                    Thread.sleep(1000);
+
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
             }
         }
     }
